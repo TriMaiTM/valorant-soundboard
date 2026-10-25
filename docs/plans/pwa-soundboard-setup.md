@@ -27,25 +27,26 @@
 
 ## 3. Implementation Steps (Các bước thực hiện)
 
-### Bước 1: Cấu hình PWA và Giao diện Controller
-- Tạo `manifest.json` và tạo icon app soundboard.
-- Cập nhật `controller.html`:
-  - Thêm thẻ meta PWA (`apple-mobile-web-app-capable`, `theme-color`).
-  - Giao diện mobile hiện đại, dạng grid nút bấm, có rung nhẹ (`navigator.vibrate`) khi bấm sound.
-  - Tự động nhận diện WebSocket qua cả HTTP (LAN) lẫn HTTPS/WSS (khi chạy Online Tunnel).
+### Bước 1: Cấu hình PWA và Giao diện Controller [x]
+- Tạo `manifest.json` và tạo icon app soundboard. [x]
+- Cập nhật `controller.html`: [x]
+  - Thêm thẻ meta PWA (`apple-mobile-web-app-capable`, `theme-color`). [x]
+  - Giao diện mobile hiện đại, dạng grid nút bấm, có rung nhẹ (`navigator.vibrate`) khi bấm sound. [x]
+  - Tự động nhận diện WebSocket qua cả HTTP (LAN) lẫn HTTPS/WSS (khi chạy Online Tunnel). [x]
 
-### Bước 2: Hiển thị IP, mDNS và Mã QR trên Engine PC
-- Cập nhật `main.js`:
-  - Lấy IP mạng LAN cục bộ và hostname của máy tính.
-  - Tích hợp module tạo QR Code (dùng thư viện nhẹ `qrcode` hoặc render SVG client-side không cần dependency nặng).
-  - Tích hợp tùy chọn Cloudflare Quick Tunnel (không cần tài khoản, hoàn toàn miễn phí) để tạo link HTTPS truy cập từ ngoài Internet khi đi quán Net.
-- Cập nhật `engine.html`:
-  - Hiển thị link nội bộ: `http://<tên-máy>.local:3000`.
-  - Hiển thị QR Code để điện thoại quét ngay tại chỗ.
-  - Nút gạt "Bật chế độ Đi Net (4G / Khác mạng)" -> sinh link public và QR tương ứng.
+### Bước 2: Hiển thị IP, mDNS và Mã QR trên Engine PC [x]
+- Cập nhật `main.js`: [x]
+  - Lấy IP mạng LAN cục bộ và hostname của máy tính. [x]
+  - Tích hợp module tạo QR Code (dùng thư viện nhẹ `qrcode` hoặc render SVG client-side không cần dependency nặng). [x]
+  - Tích hợp tùy chọn Cloudflare Quick Tunnel (không cần tài khoản, hoàn toàn miễn phí) để tạo link HTTPS truy cập từ ngoài Internet khi đi quán Net. [x]
+- Cập nhật `engine.html`: [x]
+  - Hiển thị link nội bộ: `http://<tên-máy>.local:3000`. [x]
+  - Hiển thị QR Code để điện thoại quét ngay tại chỗ. [x]
+  - Nút gạt "Bật chế độ Đi Net (4G / Khác mạng)" -> sinh link public và QR tương ứng. [x]
 
-### Bước 3: Tạo Shortcut 1-Click trên Windows
-- Tạo file `run.bat` chuẩn để người dùng bấm đúp là chạy, tự động mở app mà không hiện cửa sổ console rườm rà.
+### Bước 3: Tạo Shortcut 1-Click trên Windows [x]
+- Tạo file `run.bat` chuẩn để người dùng bấm đúp là chạy, tự động mở app mà không hiện cửa sổ console rườm rà. [x]
+- Tạo file `create-shortcut.bat` tạo phím tắt trực tiếp ngoài Desktop. [x]
 
 ---
 
