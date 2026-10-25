@@ -1,65 +1,560 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valorant Soundboard Server</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="/qrcode.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(20, 26, 45, 0.75);
+      --card-border: rgba(99, 102, 241, 0.2);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.3);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --danger: #ef4444;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top right, #1a2240 0%, #0c101d 50%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand img {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+    }
+
+    .brand h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff 30%, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .engine-status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #f87171;
+      transition: all 0.3s ease;
+    }
+
+    .engine-status-pill.active {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #34d399;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px currentColor;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    @media (max-width: 720px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    select {
+      background: rgba(15, 20, 35, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+    }
+
+    .btn-start {
+      margin-top: auto;
+      background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 14px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-start:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-start.running {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      box-shadow: 0 4px 20px var(--emerald-glow);
+    }
+
+    /* Connect Card & QR */
+    .tab-nav {
+      display: flex;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px;
+      border-radius: 10px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      padding: 8px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .connect-view {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .qr-box {
+      background: #fff;
+      padding: 10px;
+      border-radius: 14px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      min-width: 150px;
+      min-height: 150px;
+    }
+
+    .qr-box img, .qr-box canvas {
+      display: block;
+      width: 140px;
+      height: 140px;
+    }
+
+    .url-display {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.82rem;
+      font-family: monospace;
+      color: #38bdf8;
+      word-break: break-all;
+      width: 100%;
+    }
+
+    .tunnel-toggle-box {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn-tunnel {
+      background: #f59e0b;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-tunnel.active {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    /* Footer info */
+    footer {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
 <body>
-Mic thật: <select id="mic"></select><br>
-Xuất ra (chọn CABLE Input): <select id="out"></select><br>
-Nghe lại (tai nghe của bạn): <select id="mon"></select><br>
-<button id="start">Start</button>
-<script>
-const $ = id => document.getElementById(id);
-let ctx, soundGain, cache = {}, playing = new Set();
 
-const fill = (sel, list) => sel.innerHTML =
-  list.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('');
+  <header>
+    <div class="brand">
+      <img src="/icons/icon.svg" alt="Logo">
+      <div>
+        <h1>Soundboard Engine</h1>
+        <p>Valorant Audio Mixer & PWA Controller</p>
+      </div>
+    </div>
+    <div id="engine-status" class="engine-status-pill">
+      <span class="dot"></span>
+      <span id="engine-status-text">Chưa khởi động</span>
+    </div>
+  </header>
 
-(async () => {
-  (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks().forEach(t => t.stop());
-  const devs = await navigator.mediaDevices.enumerateDevices();
-  fill($('mic'), devs.filter(d => d.kind === 'audioinput'));
-  fill($('out'), devs.filter(d => d.kind === 'audiooutput'));
-  fill($('mon'), devs.filter(d => d.kind === 'audiooutput'));
-})();
+  <div class="grid-container">
+    <!-- Cột 1: Cấu hình Thiết bị Âm thanh -->
+    <div class="card">
+      <div class="card-title">
+        <span>🎧</span> Thiết Lập Định Tuyến Âm Thanh
+      </div>
 
-async function route(stream, id) {
-  const a = new Audio(); a.srcObject = stream;
-  await a.setSinkId(id); await a.play();
-}
+      <div class="form-group">
+        <label for="mic">Micro Thật (Giọng của bạn):</label>
+        <select id="mic"></select>
+      </div>
 
-$('start').onclick = async () => {
-  ctx = new AudioContext({ latencyHint: 'interactive' });
-  const mic = await navigator.mediaDevices.getUserMedia({ audio: {
-    deviceId: { exact: $('mic').value },
-    echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-  const toCable = ctx.createMediaStreamDestination();
-  const toMon = ctx.createMediaStreamDestination();
-  ctx.createMediaStreamSource(mic).connect(toCable);   // mic chỉ đi vào cable
-  soundGain = ctx.createGain();
-  soundGain.connect(toCable); soundGain.connect(toMon); // sound đi cả hai nhánh
-  await route(toCable.stream, $('out').value);
-  await route(toMon.stream, $('mon').value);
-  for (const n of await (await fetch('/list')).json()) await load(n); // nạp sẵn
-  connect();
-};
+      <div class="form-group">
+        <label for="out">Xuất Ra (Chọn CABLE Input):</label>
+        <select id="out"></select>
+      </div>
 
-async function load(n) {
-  if (cache[n]) return cache[n];
-  const r = await fetch('/sounds/' + encodeURIComponent(n));
-  return cache[n] = await ctx.decodeAudioData(await r.arrayBuffer());
-}
+      <div class="form-group">
+        <label for="mon">Nghe Lại (Tai nghe của bạn):</label>
+        <select id="mon"></select>
+      </div>
 
-async function play(n) {
-  const s = ctx.createBufferSource();
-  s.buffer = await load(n); s.connect(soundGain);
-  s.start(ctx.currentTime + 0.3);          // trễ 300 ms để kịp giữ PTT
-  playing.add(s); s.onended = () => playing.delete(s);
-}
+      <button id="start" class="btn-start">
+        <span id="start-btn-text">BẮT ĐẦU SOUNDBOARD (START)</span>
+      </button>
+    </div>
 
-function connect() {
-  const ws = new WebSocket('ws://' + location.host);
-  ws.onmessage = e => {
-    const m = JSON.parse(e.data);
-    if (m.play) play(m.play);
-    if (m.stop) playing.forEach(s => s.stop());
-  };
-  ws.onclose = () => setTimeout(connect, 1000);
-}
-</script>
+    <!-- Cột 2: Kết nối Điện thoại (PWA & QR Code) -->
+    <div class="card">
+      <div class="card-title">
+        <span>📱</span> Kết Nối Điện Thoại (Quét QR)
+      </div>
+
+      <div class="tab-nav">
+        <button id="tab-lan" class="tab-btn active" onclick="switchTab('lan')">Ở Nhà (Wi-Fi / LAN)</button>
+        <button id="tab-tunnel" class="tab-btn" onclick="switchTab('tunnel')">Đi Quán Net (4G / Online)</button>
+      </div>
+
+      <!-- Tab LAN -->
+      <div id="view-lan" class="connect-view">
+        <div id="qr-lan" class="qr-box"></div>
+        <p style="font-size: 0.8rem; color: var(--text-muted)">Mở Camera iPhone/Android quét mã để vào PWA:</p>
+        <div id="url-lan" class="url-display">Đang lấy link LAN...</div>
+      </div>
+
+      <!-- Tab Đi Net (Tunnel) -->
+      <div id="view-tunnel" class="connect-view" style="display: none;">
+        <div class="tunnel-toggle-box">
+          <p style="font-size: 0.8rem; color: #cbd5e1">Bật đường hầm an toàn khi đi Net hoặc điện thoại dùng 4G:</p>
+          <button id="btn-tunnel-toggle" class="btn-tunnel" onclick="toggleTunnel()">
+            Bật Chế Độ Đi Net
+          </button>
+        </div>
+        <div id="qr-tunnel-wrap" style="display: none; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
+          <div id="qr-tunnel" class="qr-box"></div>
+          <div id="url-tunnel" class="url-display"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span id="sound-count">Đang nạp âm thanh...</span>
+    <span>Phím tắt: [NumPad 1] phát nhanh sound đầu tiên</span>
+  </footer>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    let ctx, soundGain, cache = {}, playing = new Set();
+    let networkData = null;
+    let qrLanObj = null, qrTunnelObj = null;
+
+    const fill = (sel, list) => sel.innerHTML =
+      list.map(d => `<option value="${d.deviceId}">${d.label || 'Default Device'}</option>`).join('');
+
+    (async () => {
+      try {
+        (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks().forEach(t => t.stop());
+        const devs = await navigator.mediaDevices.enumerateDevices();
+        fill($('mic'), devs.filter(d => d.kind === 'audioinput'));
+        fill($('out'), devs.filter(d => d.kind === 'audiooutput'));
+        fill($('mon'), devs.filter(d => d.kind === 'audiooutput'));
+      } catch (e) {
+        console.error('Lỗi lấy thiết bị audio:', e);
+      }
+      fetchNetworkInfo();
+    })();
+
+    async function route(stream, id) {
+      const a = new Audio(); a.srcObject = stream;
+      if (typeof a.setSinkId === 'function') {
+        await a.setSinkId(id);
+      }
+      await a.play();
+    }
+
+    $('start').onclick = async () => {
+      if (ctx) return; // Đã chạy
+      $('start').disabled = true;
+      $('start').classList.add('running');
+      $('start-btn-text').textContent = 'ĐANG CHẠY (ENGINE ACTIVE)';
+      $('engine-status').className = 'engine-status-pill active';
+      $('engine-status-text').textContent = 'Đang hoạt động';
+
+      ctx = new AudioContext({ latencyHint: 'interactive' });
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: {
+        deviceId: { exact: $('mic').value },
+        echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+      const toCable = ctx.createMediaStreamDestination();
+      const toMon = ctx.createMediaStreamDestination();
+      ctx.createMediaStreamSource(mic).connect(toCable);   // mic chỉ đi vào cable
+      soundGain = ctx.createGain();
+      soundGain.connect(toCable); soundGain.connect(toMon); // sound đi cả hai nhánh
+      await route(toCable.stream, $('out').value);
+      await route(toMon.stream, $('mon').value);
+      
+      const list = await (await fetch('/list')).json();
+      $('sound-count').textContent = `Đã nạp ${list.length} âm thanh sẵn sàng`;
+      for (const n of list) await load(n); // nạp sẵn cache
+      connect();
+    };
+
+    async function load(n) {
+      if (cache[n]) return cache[n];
+      const r = await fetch('/sounds/' + encodeURIComponent(n));
+      return cache[n] = await ctx.decodeAudioData(await r.arrayBuffer());
+    }
+
+    async function play(n) {
+      if (!ctx) return;
+      const s = ctx.createBufferSource();
+      s.buffer = await load(n); s.connect(soundGain);
+      s.start(ctx.currentTime + 0.3);          // trễ 300 ms để kịp giữ PTT
+      playing.add(s); s.onended = () => playing.delete(s);
+    }
+
+    function connect() {
+      const ws = new WebSocket('ws://' + location.host);
+      ws.onmessage = e => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.play) play(m.play);
+          if (m.stop) playing.forEach(s => s.stop());
+        } catch (err) {}
+      };
+      ws.onclose = () => setTimeout(connect, 1000);
+    }
+
+    // Network & QR management
+    async function fetchNetworkInfo() {
+      try {
+        const res = await fetch('/network-info');
+        networkData = await res.json();
+        
+        // Ưu tiên mDNS URL nếu có, hoặc IP LAN đầu tiên
+        const primaryUrl = networkData.mdnsUrl || (networkData.lanUrls[0] || ('http://' + location.host));
+        $('url-lan').textContent = primaryUrl;
+
+        // Render QR LAN
+        $('qr-lan').innerHTML = '';
+        qrLanObj = new QRCode($('qr-lan'), {
+          text: primaryUrl,
+          width: 140,
+          height: 140,
+          colorDark: "#090d16",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.M
+        });
+
+        if (networkData.tunnelUrl) {
+          showTunnelUrl(networkData.tunnelUrl);
+        }
+      } catch (err) {
+        console.error('Lỗi lấy network info:', err);
+      }
+    }
+
+    function switchTab(tab) {
+      if (tab === 'lan') {
+        $('tab-lan').classList.add('active');
+        $('tab-tunnel').classList.remove('active');
+        $('view-lan').style.display = 'flex';
+        $('view-tunnel').style.display = 'none';
+      } else {
+        $('tab-tunnel').classList.add('active');
+        $('tab-lan').classList.remove('active');
+        $('view-lan').style.display = 'none';
+        $('view-tunnel').style.display = 'flex';
+      }
+    }
+
+    async function toggleTunnel() {
+      const btn = $('btn-tunnel-toggle');
+      const isRunning = btn.classList.contains('active');
+      btn.disabled = true;
+      btn.textContent = isRunning ? 'Đang tắt đường hầm...' : 'Đang khởi tạo đường hầm...';
+
+      try {
+        const res = await fetch('/tunnel?enable=' + (isRunning ? '0' : '1'));
+        const data = await res.json();
+        btn.disabled = false;
+
+        if (data.success && data.tunnelUrl) {
+          showTunnelUrl(data.tunnelUrl);
+        } else {
+          hideTunnelUrl();
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = isRunning ? 'Tắt Chế Độ Đi Net' : 'Bật Chế Độ Đi Net';
+        alert('Lỗi đường hầm: ' + err.message);
+      }
+    }
+
+    function showTunnelUrl(url) {
+      const btn = $('btn-tunnel-toggle');
+      btn.classList.add('active');
+      btn.textContent = 'Tắt Chế Độ Đi Net';
+      $('qr-tunnel-wrap').style.display = 'flex';
+      $('url-tunnel').textContent = url;
+
+      $('qr-tunnel').innerHTML = '';
+      qrTunnelObj = new QRCode($('qr-tunnel'), {
+        text: url,
+        width: 140,
+        height: 140,
+        colorDark: "#090d16",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    }
+
+    function hideTunnelUrl() {
+      const btn = $('btn-tunnel-toggle');
+      btn.classList.remove('active');
+      btn.textContent = 'Bật Chế Độ Đi Net';
+      $('qr-tunnel-wrap').style.display = 'none';
+      $('url-tunnel').textContent = '';
+    }
+  </script>
 </body>
+</html>
