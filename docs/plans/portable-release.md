@@ -58,6 +58,7 @@
 - Cấu hình `package.json` với script `dist:portable`. [x]
 - Chạy build và kiểm tra file `dist/Valorant-Soundboard-Portable.exe` (105 MB). [x]
 
-### Bước 5: Đẩy Code & Tạo GitHub Release [ ]
+### Bước 5: Đẩy Code & Tạo GitHub Release [x]
 - `git remote add origin https://github.com/TriMaiTM/valorant-soundboard.git` [x]
-- Đẩy branch và tạo tag release trên GitHub. [ ]
+- Đẩy branch `main` lên GitHub repo. [x]
+- Thiết lập GitHub Actions tự động build và đính kèm `Valorant-Soundboard-Portable.exe` vào GitHub Release khi đẩy tag `v*`. [x]
