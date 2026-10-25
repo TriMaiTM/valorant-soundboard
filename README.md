@@ -1,40 +1,43 @@
-# 🎮 Valorant Soundboard (Portable & PWA)
+# Valorant Soundboard (Portable & PWA)
 
-Ứng dụng Soundboard tùy biến cho Valorant và game online, hỗ trợ trộn âm thanh mic thật, phím tắt NumPad toàn cục in-game và điều khiển từ xa qua điện thoại (PWA).
-
----
-
-## ✨ Tính năng nổi bật
-
-- **🎧 Audio Mixer chống vọng:** Trộn tiếng Mic thật và SFX vào đường âm thanh ảo (`VB-CABLE Input`) cho bạn bè trong game nghe, đồng thời gửi hiệu ứng về tai nghe của bạn mà không bị lặp lại tiếng mic của chính mình.
-- **⌨️ Phím tắt NumPad toàn cục:** Tự động gán `NumPad 1` đến `NumPad 9` cho các âm thanh và `NumPad 0` để **Dừng tất cả (Stop)** ngay trong trận Valorant mà không cần Alt-Tab hay cầm điện thoại.
-- **📂 Quản lý SFX dễ dàng:** Nút "Mở Thư Mục Sounds" mở ngay thư mục trên Windows. Kéo thả, thêm, xóa file `.mp3`, `.wav`, `.ogg` là app tự động nạp lại realtime.
-- **📱 PWA Controller trên điện thoại:** Quét mã QR là vào ngay giao diện điều khiển, có rung phản hồi haptic, tìm kiếm âm thanh, cài ra màn hình chính không cần thanh địa chỉ Safari/Chrome.
-- **🌐 Chế độ Đi Quán Net (Cloudflare Quick Tunnel):** Khi đi Net (khác mạng hoặc điện thoại dùng 4G), chỉ cần bấm 1 nút là có ngay link an toàn và mã QR để kết nối xuyên qua tường lửa phòng máy.
-- **🚀 Portable 1-Click:** Đóng gói thành 1 file duy nhất `Valorant-Soundboard-Portable.exe`, nhấp đúp là chạy, không cần cài đặt hay quyền Administrator.
+A customizable soundboard for Valorant and other online games. It mixes your real microphone with sound effects, supports global NumPad hotkeys in-game, and can be controlled remotely from your phone (PWA).
 
 ---
 
-## 🛠️ Hướng dẫn cài đặt & Cấu hình âm thanh
+## Features
 
-### 1. Chuẩn bị
-Tải và cài đặt driver âm thanh ảo miễn phí: **[VB-Audio CABLE](https://vb-audio.com/Cable/)** (chỉ mất ~30 giây).
-
-### 2. Thiết lập trên App Soundboard:
-- **Micro Thật:** Chọn micro vật lý bạn đang dùng.
-- **Xuất Ra:** Chọn `CABLE Input (VB-Audio Virtual Cable)`.
-- **Nghe Lại:** Chọn Tai nghe vật lý của bạn.
-- Bấm **BẮT ĐẦU SOUNDBOARD (START)**.
-
-### 3. Thiết lập trong Valorant (Cài đặt > Âm thanh > Voice Chat):
-- **Thiết bị đầu vào (Input Device):** Đổi thành `CABLE Output (VB-Audio Virtual Cable)`.
-- **Thiết bị đầu ra (Output Device):** Chọn Tai nghe của bạn bình thường.
-- *Lưu ý:* Nếu dùng chế độ **Push-To-Talk (PTT)** trong Valorant, hãy bấm giữ phím PTT khi bấm phát âm thanh. App đã có độ trễ 300ms để kịp giữ phím.
+- **Echo-free audio mixer:** Mixes your real mic and SFX into the virtual audio path (`VB-CABLE Input`) so your teammates hear both, while sending the effects back to your headphones without looping your own mic voice.
+- **Global NumPad hotkeys:** Automatically binds `NumPad 1` to `NumPad 9` to your sounds and `NumPad 0` to **stop all sounds**, right in the middle of a Valorant match, with no Alt-Tab and no need to pick up your phone.
+- **Easy SFX management:** The "Open Sounds Folder" button opens the folder in Windows. Drag, drop, add, or delete `.mp3`, `.wav`, and `.ogg` files, and the app reloads them in real time.
+- **Phone PWA controller:** Scan a QR code to open the control interface instantly, with haptic feedback, sound search, and the option to install it on your home screen without the Safari/Chrome address bar.
+- **Internet cafe mode (Cloudflare Quick Tunnel):** When you are on a different network (or your phone is on 4G), one button gives you a secure link and QR code that connects through the cafe's firewall.
+- **One-click portable build:** Packaged as a single file, `Valorant-Soundboard-Portable.exe`. Double-click to run, with no installation and no Administrator rights required.
 
 ---
 
-## 📁 Thêm hoặc xóa âm thanh
+## Setup and Audio Configuration
 
-1. Bấm nút **📂 Mở Thư Mục Sounds** trên giao diện ứng dụng máy tính.
-2. Thả file âm thanh (`.mp3`, `.wav`, `.ogg`, `.m4a`) vào thư mục hoặc xóa file không cần thiết.
-3. Ứng dụng sẽ tự động cập nhật danh sách và gán phím tắt `NumPad 1-9` theo thứ tự bảng chữ cái.
+### 1. Preparation
+
+Download and install the free virtual audio driver: [VB-Audio CABLE](https://vb-audio.com/Cable/) (takes about 30 seconds).
+
+### 2. Configure the Soundboard app
+
+- **Real Microphone:** Select the physical microphone you are using.
+- **Output:** Select `CABLE Input (VB-Audio Virtual Cable)`.
+- **Monitor:** Select your physical headphones.
+- Click **START SOUNDBOARD**.
+
+### 3. Configure Valorant (Settings > Audio > Voice Chat)
+
+- **Input Device:** Change to `CABLE Output (VB-Audio Virtual Cable)`.
+- **Output Device:** Select your headphones as usual.
+- *Note:* If you use **Push-To-Talk (PTT)** in Valorant, hold your PTT key while playing a sound. The app adds a 300 ms delay so you have time to press the key.
+
+---
+
+## Adding or Removing Sounds
+
+1. Click the **Open Sounds Folder** button in the desktop app.
+2. Drop audio files (`.mp3`, `.wav`, `.ogg`, `.m4a`) into the folder, or delete the ones you no longer need.
+3. The app updates the list automatically and assigns `NumPad 1-9` hotkeys in alphabetical order.
