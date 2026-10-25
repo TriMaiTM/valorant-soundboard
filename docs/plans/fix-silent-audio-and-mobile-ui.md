@@ -60,10 +60,9 @@
 - [x] Clean up `.pad-key-tag` CSS rule.
 - [x] Verify mobile rendering and JS syntax.
 
-### Step 4: Rebuild Portable EXE & Release Tag [ ]
-- Run `npm run dist:portable`.
-- Commit changes with Conventional Commits.
-- Merge branch into `main` and tag `v1.5.0`.
+### Step 4: Rebuild Portable EXE & Release Tag [x]
+- [x] Run `npm run dist:portable` successfully generating `dist/Valorant-Soundboard-Portable.exe`.
+- [x] Merge into `main` and tag `v1.5.0`.
 
 ---
 
