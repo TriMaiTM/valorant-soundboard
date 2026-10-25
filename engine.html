@@ -1,22 +1,21 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valorant Stream Deck Soundboard</title>
+  <title>Valorant Stream Deck</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
   
   <script src="/qrcode.min.js"></script>
 
   <style>
     :root {
       --bg: #07090e;
-      --deck-bg: #0f1322;
-      --card-bg: rgba(18, 24, 43, 0.75);
-      --card-border: rgba(99, 102, 241, 0.2);
+      --card-bg: rgba(16, 21, 38, 0.78);
+      --card-border: rgba(99, 102, 241, 0.18);
       --accent: #6366f1;
       --accent-glow: rgba(99, 102, 241, 0.35);
       --emerald: #10b981;
@@ -37,15 +36,16 @@
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at 85% 15%, #18203d 0%, #0c101d 50%, var(--bg) 100%);
+      background: radial-gradient(circle at 85% 15%, #18203d 0%, #0c101d 55%, var(--bg) 100%);
       color: var(--text);
       min-height: 100vh;
-      padding: 16px 20px;
+      padding: 16px 22px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 16px;
     }
 
+    /* Header */
     header {
       display: flex;
       justify-content: space-between;
@@ -61,9 +61,9 @@
     }
 
     .brand img {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
       box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
     }
 
@@ -77,36 +77,63 @@
     }
 
     .brand p {
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: var(--text-muted);
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
-    .btn-action {
-      background: rgba(255, 255, 255, 0.07);
+    /* Single Icon Action Buttons with Tooltip */
+    .icon-btn {
+      position: relative;
+      background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 999px;
-      padding: 6px 14px;
-      color: #cbd5e1;
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
+      border-radius: 10px;
+      width: 36px;
+      height: 36px;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .btn-action:hover {
+    .icon-btn:hover {
       background: rgba(99, 102, 241, 0.2);
       border-color: var(--accent);
       color: #fff;
+    }
+
+    /* Tooltip */
+    .icon-btn::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: -32px;
+      right: 50%;
+      transform: translateX(50%);
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #e2e8f0;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      z-index: 100;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .icon-btn:hover::after {
+      opacity: 1;
+      transform: translateX(50%) translateY(2px);
     }
 
     .engine-status-pill {
@@ -137,14 +164,14 @@
       box-shadow: 0 0 10px currentColor;
     }
 
-    /* Top Grid: Audio setup & Mobile QR */
+    /* Top Grid: Expanded Audio Router & Mobile Controller */
     .top-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 14px;
+      grid-template-columns: 1.25fr 0.85fr;
+      gap: 16px;
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 860px) {
       .top-grid {
         grid-template-columns: 1fr;
       }
@@ -153,16 +180,16 @@
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 16px;
-      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      padding: 18px;
+      backdrop-filter: blur(14px);
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .card-title {
-      font-size: 0.92rem;
+      font-size: 0.94rem;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -170,34 +197,35 @@
       color: #fff;
     }
 
-    .audio-row {
+    .audio-inputs-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 5px;
     }
 
     .form-group label {
-      font-size: 0.75rem;
+      font-size: 0.76rem;
       font-weight: 600;
       color: var(--text-muted);
     }
 
     select {
-      background: rgba(10, 14, 26, 0.85);
+      background: rgba(10, 14, 26, 0.9);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 9px 10px;
       color: #fff;
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       outline: none;
       transition: border-color 0.2s;
+      width: 100%;
     }
 
     select:focus {
@@ -205,33 +233,35 @@
     }
 
     .btn-start {
+      margin-top: 2px;
       background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 10px;
-      padding: 10px;
+      padding: 12px;
       color: #fff;
       font-family: inherit;
-      font-size: 0.88rem;
-      font-weight: 700;
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 16px var(--accent-glow);
+      box-shadow: 0 4px 18px var(--accent-glow);
       transition: all 0.2s ease;
     }
 
     .btn-start.running {
       background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      box-shadow: 0 4px 16px var(--emerald-glow);
+      box-shadow: 0 4px 18px var(--emerald-glow);
     }
 
-    /* Mobile Connect mini tab */
+    /* Mobile Connect View */
     .tab-nav {
       display: flex;
       gap: 6px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.35);
       padding: 3px;
       border-radius: 8px;
     }
@@ -241,7 +271,7 @@
       background: transparent;
       border: none;
       border-radius: 6px;
-      padding: 5px;
+      padding: 6px;
       color: var(--text-muted);
       font-family: inherit;
       font-size: 0.75rem;
@@ -258,57 +288,80 @@
     .connect-row {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
+      flex: 1;
     }
 
     .qr-box {
       background: #fff;
-      padding: 6px;
-      border-radius: 10px;
+      padding: 7px;
+      border-radius: 12px;
       display: inline-flex;
       justify-content: center;
       align-items: center;
       flex-shrink: 0;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.45);
     }
 
     .qr-box img, .qr-box canvas {
       display: block;
-      width: 78px;
-      height: 78px;
+      width: 96px;
+      height: 96px;
     }
 
     .connect-info {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
       flex: 1;
       overflow: hidden;
     }
 
     .url-display {
-      background: rgba(0, 0, 0, 0.35);
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 6px;
-      padding: 6px 8px;
-      font-size: 0.72rem;
-      font-family: monospace;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.74rem;
+      font-family: 'JetBrains Mono', monospace;
       color: #38bdf8;
       word-break: break-all;
+    }
+
+    .btn-tunnel {
+      background: #f59e0b;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+    }
+
+    .btn-tunnel.active {
+      background: #ef4444;
+      color: #fff;
     }
 
     /* ======================================= */
     /* STREAM DECK SECTION                     */
     /* ======================================= */
     .streamdeck-container {
-      background: #0b0f1d;
-      border: 2px solid rgba(99, 102, 241, 0.25);
-      border-radius: 20px;
-      padding: 18px;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.6), 0 8px 30px rgba(0,0,0,0.5);
+      background: #090e1c;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.6), 0 8px 30px rgba(0,0,0,0.4);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       flex: 1;
     }
 
@@ -321,18 +374,18 @@
     }
 
     .deck-title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 800;
       display: flex;
       align-items: center;
       gap: 8px;
       color: #e2e8f0;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.3px;
     }
 
     .deck-hint {
-      font-size: 0.75rem;
-      color: var(--amber);
+      font-size: 0.74rem;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       gap: 6px;
@@ -341,57 +394,47 @@
     /* Grid of LCD Key Pads */
     .deck-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(auto-fill, minmax(122px, 1fr));
+      gap: 12px;
       overflow-y: auto;
-      max-height: 380px;
-      padding: 4px;
+      max-height: 290px;
+      padding: 2px 2px 6px;
     }
 
-    /* Key Pad */
+    /* Stream Deck Pad */
     .deck-pad {
-      background: linear-gradient(145deg, #182035 0%, #101626 100%);
-      border: 2px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      height: 125px;
+      background: linear-gradient(145deg, #161e33 0%, #0d1424 100%);
+      border: 1.5px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      height: 104px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 10px;
+      padding: 8px 10px;
       position: relative;
       cursor: pointer;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.15);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.12);
       transition: all 0.15s ease;
       overflow: hidden;
     }
 
-    .deck-pad::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 70%);
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
     .deck-pad:hover {
-      border-color: rgba(99, 102, 241, 0.5);
+      border-color: rgba(99, 102, 241, 0.45);
       transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 8px 18px rgba(99, 102, 241, 0.2);
     }
 
     .deck-pad:active {
       transform: scale(0.96);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
     }
 
     .deck-pad.playing {
       border-color: #38bdf8;
-      box-shadow: 0 0 24px rgba(56, 189, 248, 0.45), inset 0 0 15px rgba(56, 189, 248, 0.3);
-      animation: pulse 0.5s ease infinite alternate;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.25);
+      animation: pulsePad 0.5s ease infinite alternate;
     }
 
-    @keyframes pulse {
+    @keyframes pulsePad {
       from { transform: scale(0.98); }
       to { transform: scale(1.02); }
     }
@@ -403,48 +446,51 @@
       width: 100%;
     }
 
-    /* Hotkey badge on pad */
-    .key-badge {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      color: #a5b4fc;
-      border-radius: 6px;
-      padding: 3px 7px;
-      font-size: 0.72rem;
+    /* Subtle Keybind Label on top left */
+    .pad-key-text {
+      font-size: 0.68rem;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
+      color: #818cf8;
+      opacity: 0.85;
       letter-spacing: -0.2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 74px;
+    }
+
+    /* 3-Lines Menu Button in top right corner */
+    .pad-menu-btn {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
       transition: all 0.2s;
     }
 
-    .key-badge:hover {
-      background: var(--accent);
+    .pad-menu-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
       color: #fff;
-      border-color: #fff;
-    }
-
-    .key-badge.recording {
-      background: #f59e0b;
-      color: #000;
-      border-color: #f59e0b;
-      box-shadow: 0 0 12px #f59e0b;
-      animation: blink 0.8s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
     }
 
     .pad-icon {
-      font-size: 1.4rem;
-      text-align: center;
-      margin: auto 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #a5b4fc;
       opacity: 0.9;
+      margin: auto 0;
     }
 
     .pad-title {
-      font-size: 0.78rem;
+      font-size: 0.74rem;
       font-weight: 700;
       line-height: 1.25;
       text-align: center;
@@ -455,40 +501,148 @@
 
     /* Emergency Stop Pad */
     .deck-pad.stop-pad {
-      background: linear-gradient(145deg, #3f1212 0%, #1f0808 100%);
-      border-color: rgba(239, 68, 68, 0.35);
+      background: linear-gradient(145deg, #361010 0%, #1a0707 100%);
+      border-color: rgba(239, 68, 68, 0.3);
     }
 
     .deck-pad.stop-pad:hover {
       border-color: #ef4444;
-      box-shadow: 0 10px 22px rgba(239, 68, 68, 0.3);
+      box-shadow: 0 8px 18px rgba(239, 68, 68, 0.3);
     }
 
-    .deck-pad.stop-pad .key-badge {
-      border-color: rgba(239, 68, 68, 0.5);
+    .deck-pad.stop-pad .pad-key-text {
       color: #fca5a5;
+    }
+
+    .deck-pad.stop-pad .pad-icon {
+      color: #ef4444;
     }
 
     .deck-pad.stop-pad .pad-title {
       color: #f87171;
     }
 
+    /* Keybind Popover Modal */
+    .modal-backdrop {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-box {
+      background: #12182c;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      width: 330px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .modal-close-btn:hover {
+      color: #fff;
+    }
+
+    .modal-current-key {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .modal-current-key.listening {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #f59e0b;
+      color: #f59e0b;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-modal {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-modal.primary {
+      background: var(--accent);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    .btn-modal.secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+    }
+
     /* Toast notification */
     #toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
+      bottom: 20px;
+      right: 20px;
       background: #1e1b4b;
       border: 1px solid var(--accent);
       color: #fff;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-size: 0.84rem;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 0.82rem;
       font-weight: 700;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
       opacity: 0;
       pointer-events: none;
-      transform: translateY(10px);
+      transform: translateY(8px);
       transition: all 0.25s ease;
       z-index: 999;
     }
@@ -501,97 +655,172 @@
 </head>
 <body>
 
+  <!-- Header -->
   <header>
     <div class="brand">
       <img src="/icons/icon.svg" alt="Logo">
       <div>
         <h1>Valorant Stream Deck</h1>
-        <p>Bộ trộn âm thanh & Phím tắt In-Game toàn cục</p>
+        <p>Audio Mixer & Global In-Game Hotkeys</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-action" onclick="openSoundsFolder()">
-        📂 Thư Mục Sounds
+      <!-- Lucide Folder Icon Button -->
+      <button class="icon-btn" data-tooltip="Open Sounds Folder" onclick="openSoundsFolder()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+        </svg>
       </button>
-      <button class="btn-action" onclick="resetDefaultKeybinds()">
-        🔄 Reset Phím NumPad
+
+      <!-- Lucide Rotate-CCW Icon Button -->
+      <button class="icon-btn" data-tooltip="Reset Default Keybinds" onclick="resetDefaultKeybinds()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
       </button>
+
+      <!-- Status Pill -->
       <div id="engine-status" class="engine-status-pill">
         <span class="dot"></span>
-        <span id="engine-status-text">Chưa khởi động</span>
+        <span id="engine-status-text">Offline</span>
       </div>
     </div>
   </header>
 
-  <!-- Top Config Row -->
+  <!-- Expanded Top Section: Audio Router & Mobile Connection -->
   <div class="top-grid">
-    <!-- Card Âm Thanh -->
+    <!-- Audio Router Card -->
     <div class="card">
       <div class="card-title">
-        <span>🎧</span> Thiết Lập Định Tuyến (Audio Router)
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8">
+          <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"></path>
+        </svg>
+        Audio Router
       </div>
-      <div class="audio-row">
+
+      <div class="audio-inputs-grid">
         <div class="form-group">
-          <label for="mic">Mic Thật:</label>
+          <label for="mic">Microphone:</label>
           <select id="mic"></select>
         </div>
         <div class="form-group">
-          <label for="out">Xuất Ra (CABLE Input):</label>
+          <label for="out">Output (CABLE Input):</label>
           <select id="out"></select>
         </div>
         <div class="form-group">
-          <label for="mon">Tai Nghe (Nghe Lại):</label>
+          <label for="mon">Monitoring (Headphones):</label>
           <select id="mon"></select>
         </div>
       </div>
+
       <button id="start" class="btn-start">
-        <span id="start-btn-text">BẮT ĐẦU SOUNDBOARD (START ENGINE)</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="6 3 20 12 6 21 6 3"></polygon>
+        </svg>
+        <span id="start-btn-text">START ENGINE</span>
       </button>
     </div>
 
-    <!-- Card Kết Nối Mobile -->
+    <!-- Mobile Controller Card -->
     <div class="card">
       <div class="card-title" style="justify-content: space-between;">
-        <span>📱 Điều Khiển Điện Thoại</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8">
+            <rect width="14" height="20" x="5" y="2" rx="2" ry="2"></rect>
+            <path d="M12 18h.01"></path>
+          </svg>
+          Mobile Controller
+        </div>
         <div class="tab-nav">
-          <button id="tab-lan" class="tab-btn active" onclick="switchTab('lan')">Wi-Fi (Ở Nhà)</button>
-          <button id="tab-tunnel" class="tab-btn" onclick="switchTab('tunnel')">4G / Quán Net</button>
+          <button id="tab-lan" class="tab-btn active" onclick="switchTab('lan')">Wi-Fi (LAN)</button>
+          <button id="tab-tunnel" class="tab-btn" onclick="switchTab('tunnel')">Online (Tunnel)</button>
         </div>
       </div>
 
+      <!-- LAN Tab -->
       <div id="view-lan" class="connect-row">
         <div id="qr-lan" class="qr-box"></div>
         <div class="connect-info">
-          <p style="font-size: 0.74rem; color: var(--text-muted)">Quét mã để mở Stream Deck trên điện thoại:</p>
-          <div id="url-lan" class="url-display">Đang lấy link...</div>
+          <p style="font-size: 0.74rem; color: var(--text-muted)">Scan with phone camera to open Stream Deck:</p>
+          <div id="url-lan" class="url-display">Fetching link...</div>
         </div>
       </div>
 
+      <!-- Tunnel Tab -->
       <div id="view-tunnel" class="connect-row" style="display: none;">
-        <button id="btn-tunnel-toggle" class="btn-action" style="background:#f59e0b; color:#000;" onclick="toggleTunnel()">
-          Bật Chế Độ Đi Net
-        </button>
-        <div id="qr-tunnel-wrap" style="display: none; align-items: center; gap: 8px;">
+        <div id="qr-tunnel-wrap" style="display: none; align-items: center; gap: 14px; width: 100%;">
           <div id="qr-tunnel" class="qr-box"></div>
-          <div id="url-tunnel" class="url-display"></div>
+          <div class="connect-info">
+            <p style="font-size: 0.74rem; color: var(--text-muted)">Tunnel active! Scan from 4G / anywhere:</p>
+            <div id="url-tunnel" class="url-display"></div>
+            <button id="btn-tunnel-off" class="btn-tunnel active" onclick="toggleTunnel()">
+              Disable Online Mode
+            </button>
+          </div>
+        </div>
+        <div id="tunnel-init-box" style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="font-size: 0.76rem; color: #cbd5e1">Creates a secure public HTTPS link for net cafes or 4G data:</p>
+          <button id="btn-tunnel-on" class="btn-tunnel" onclick="toggleTunnel()">
+            Enable Online Mode
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- BÀN PHÍM STREAM DECK -->
+  <!-- Stream Deck Pad Section -->
   <div class="streamdeck-container">
     <div class="deck-header">
       <div class="deck-title">
-        <span>🎛️</span> BÀN ĐIỀU KHIỂN STREAM DECK
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:#818cf8">
+          <rect width="7" height="7" x="3" y="3" rx="1"></rect>
+          <rect width="7" height="7" x="14" y="3" rx="1"></rect>
+          <rect width="7" height="7" x="14" y="14" rx="1"></rect>
+          <rect width="7" height="7" x="3" y="14" rx="1"></rect>
+        </svg>
+        STREAM DECK
       </div>
       <div class="deck-hint">
-        <span>💡 Nhấp vào ô [ Phím ] trên từng nút để bấm gán phím tắt mới</span>
+        Click pad to preview sound • Click ☰ icon to customize hotkey
       </div>
     </div>
 
     <div id="deck-grid" class="deck-grid">
-      <!-- Các phím Stream Deck được render tự động -->
+      <!-- Stream Deck pads rendered dynamically -->
+    </div>
+  </div>
+
+  <!-- Keybind Configuration Popover Modal -->
+  <div id="key-modal" class="modal-backdrop" onclick="closeKeyModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-sound-name">Customize Hotkey</div>
+        <button class="modal-close-btn" onclick="closeKeyModal()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div style="font-size: 0.78rem; color: var(--text-muted);">
+        Assigned in-game hotkey:
+      </div>
+      <div id="modal-key-display" class="modal-current-key">None</div>
+
+      <div class="modal-actions">
+        <button id="btn-record-key" class="btn-modal primary" onclick="startModalRecord()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+          </svg>
+          Record Key
+        </button>
+        <button class="btn-modal secondary" onclick="clearModalKey()">
+          Clear Key
+        </button>
+      </div>
     </div>
   </div>
 
@@ -601,10 +830,11 @@
     const $ = id => document.getElementById(id);
     let ctx, soundGain, cache = {}, playing = new Set();
     let networkData = null, soundList = [], keybindMap = { stop: 'num0', sounds: {} };
-    let recordingTarget = null; // null, 'stop', hoặc 'filename.mp3'
+    let activeModalTarget = null; // 'stop' or 'filename.mp3'
+    let isRecordingInModal = false;
 
     const fill = (sel, list) => sel.innerHTML =
-      list.map(d => `<option value="${d.deviceId}">${d.label || 'Default Device'}</option>`).join('');
+      list.map(d => `<option value="${d.deviceId}">${d.label || 'Default Audio Device'}</option>`).join('');
 
     (async () => {
       try {
@@ -651,84 +881,140 @@
       const grid = $('deck-grid');
       grid.innerHTML = '';
 
-      // 1. Phím STOP ALL
+      // 1. Emergency Stop Pad
       const stopPad = document.createElement('div');
       stopPad.className = 'deck-pad stop-pad';
       stopPad.id = 'pad-stop';
       const stopKey = keybindMap.stop || 'num0';
+
       stopPad.innerHTML = `
         <div class="pad-top">
-          <span class="key-badge ${recordingTarget === 'stop' ? 'recording' : ''}" onclick="startRecordKey(event, 'stop')">
-            ${recordingTarget === 'stop' ? 'Bấm phím...' : stopKey}
-          </span>
-          <span style="font-size:0.75rem; color:#f87171">🛑</span>
+          <span class="pad-key-text">${stopKey}</span>
+          <button class="pad-menu-btn" title="Options" onclick="openKeyModal(event, 'stop')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
+          </button>
         </div>
-        <div class="pad-icon">⏹️</div>
-        <div class="pad-title">DỪNG TẤT CẢ</div>
+        <div class="pad-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+          </svg>
+        </div>
+        <div class="pad-title">STOP ALL</div>
       `;
       stopPad.onclick = (e) => {
-        if (e.target.classList.contains('key-badge')) return;
+        if (e.target.closest('.pad-menu-btn')) return;
         stopAll();
       };
       grid.appendChild(stopPad);
 
-      // 2. Các phím Sound Pads
+      // 2. Sound Pads
       soundList.forEach((filename) => {
         const pad = document.createElement('div');
         pad.className = 'deck-pad';
         pad.id = 'pad-' + encodeURIComponent(filename);
-        const assignedKey = keybindMap.sounds[filename] || 'Chưa gán';
+        const assignedKey = keybindMap.sounds[filename] || '';
 
         pad.innerHTML = `
           <div class="pad-top">
-            <span class="key-badge ${recordingTarget === filename ? 'recording' : ''}" onclick="startRecordKey(event, '${encodeURIComponent(filename)}')">
-              ${recordingTarget === filename ? 'Bấm phím...' : assignedKey}
-            </span>
-            <span style="font-size:0.75rem; color:#818cf8">🔊</span>
+            <span class="pad-key-text">${assignedKey}</span>
+            <button class="pad-menu-btn" title="Options" onclick="openKeyModal(event, '${encodeURIComponent(filename)}')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="18" x2="20" y2="18"></line>
+              </svg>
+            </button>
           </div>
-          <div class="pad-icon">🎵</div>
+          <div class="pad-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 18V5l12-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="18" cy="16" r="3"></circle>
+            </svg>
+          </div>
           <div class="pad-title" title="${filename}">${formatName(filename)}</div>
         `;
 
         pad.onclick = (e) => {
-          if (e.target.classList.contains('key-badge')) return;
+          if (e.target.closest('.pad-menu-btn')) return;
           send({ play: filename });
         };
         grid.appendChild(pad);
       });
     }
 
-    /* Keybind Recording */
-    function startRecordKey(e, targetId) {
+    /* Modal Keybind Configuration */
+    function openKeyModal(e, targetId) {
       e.stopPropagation();
-      recordingTarget = decodeURIComponent(targetId);
-      renderStreamDeck();
-      showToast(`Đang gán phím: Hãy nhấn phím bất kỳ trên bàn phím (Esc để hủy, Backspace để xóa)`);
+      activeModalTarget = decodeURIComponent(targetId);
+      isRecordingInModal = false;
+
+      const title = activeModalTarget === 'stop' ? 'Stop All Audio' : formatName(activeModalTarget);
+      $('modal-sound-name').textContent = title;
+
+      const currentKey = activeModalTarget === 'stop'
+        ? (keybindMap.stop || 'num0')
+        : (keybindMap.sounds[activeModalTarget] || 'None');
+
+      const keyDisp = $('modal-key-display');
+      keyDisp.textContent = currentKey;
+      keyDisp.className = 'modal-current-key';
+      $('btn-record-key').innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polygon points="10 8 16 12 10 16 10 8"></polygon>
+        </svg>
+        Record Key
+      `;
+
+      $('key-modal').style.display = 'flex';
+    }
+
+    function closeKeyModal() {
+      $('key-modal').style.display = 'none';
+      activeModalTarget = null;
+      isRecordingInModal = false;
+    }
+
+    function startModalRecord() {
+      isRecordingInModal = true;
+      const keyDisp = $('modal-key-display');
+      keyDisp.textContent = 'Press any key...';
+      keyDisp.className = 'modal-current-key listening';
+      $('btn-record-key').textContent = 'Listening...';
+    }
+
+    async function clearModalKey() {
+      if (!activeModalTarget) return;
+      await saveTargetKey(activeModalTarget, '');
+      closeKeyModal();
     }
 
     window.addEventListener('keydown', async (e) => {
-      if (!recordingTarget) return;
+      if (!isRecordingInModal || !activeModalTarget) return;
       e.preventDefault();
       e.stopPropagation();
 
       if (e.key === 'Escape') {
-        recordingTarget = null;
-        renderStreamDeck();
-        showToast('Đã hủy gán phím');
+        isRecordingInModal = false;
+        closeKeyModal();
         return;
       }
 
       let keyStr = '';
 
       if (e.key === 'Backspace' || e.key === 'Delete') {
-        keyStr = ''; // Xóa phím tắt
+        keyStr = '';
       } else {
         const parts = [];
         if (e.ctrlKey) parts.push('CommandOrControl');
         if (e.altKey) parts.push('Alt');
         if (e.shiftKey) parts.push('Shift');
 
-        // Phím NumPad
         if (e.code.startsWith('Numpad')) {
           parts.push(e.code.toLowerCase().replace('pad', '')); // Numpad1 -> num1
         } else if (/^F[1-9][0-2]?$/.test(e.code)) {
@@ -746,9 +1032,13 @@
         keyStr = parts.join('+');
       }
 
-      const target = recordingTarget;
-      recordingTarget = null;
+      const target = activeModalTarget;
+      isRecordingInModal = false;
+      closeKeyModal();
+      await saveTargetKey(target, keyStr);
+    }, true);
 
+    async function saveTargetKey(target, keyStr) {
       try {
         const payload = target === 'stop' ? { stop: keyStr } : { filename: target, key: keyStr };
         const res = await fetch('/keybinds', {
@@ -760,22 +1050,22 @@
         if (data.success) {
           keybindMap = data.keybinds;
           renderStreamDeck();
-          showToast(`Đã gán [ ${keyStr || 'Không có'} ] cho ${target === 'stop' ? 'Dừng Tất Cả' : formatName(target)}`);
+          showToast(`Hotkey saved: [ ${keyStr || 'None'} ]`);
         }
       } catch (err) {
-        alert('Lỗi lưu phím tắt: ' + err.message);
+        alert('Error saving hotkey: ' + err.message);
       }
-    }, true);
+    }
 
     async function resetDefaultKeybinds() {
-      if (!confirm('Bạn có muốn đặt lại phím tắt về mặc định NumPad 0 - 9 không?')) return;
+      if (!confirm('Reset all hotkeys back to default NumPad 0 - 9?')) return;
       try {
         const res = await fetch('/keybinds/reset', { method: 'POST' });
         const data = await res.json();
         if (data.success) {
           keybindMap = data.keybinds;
           renderStreamDeck();
-          showToast('Đã đặt lại phím tắt NumPad mặc định!');
+          showToast('Hotkeys reset to default NumPad 0 - 9');
         }
       } catch (e) {}
     }
@@ -784,7 +1074,7 @@
       const t = $('toast');
       t.textContent = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3500);
+      setTimeout(() => t.classList.remove('show'), 3000);
     }
 
     /* Web Audio & Routing */
@@ -798,9 +1088,9 @@
       if (ctx) return;
       $('start').disabled = true;
       $('start').classList.add('running');
-      $('start-btn-text').textContent = 'ENGINE ĐANG CHẠY (ACTIVE)';
+      $('start-btn-text').textContent = 'ENGINE ACTIVE';
       $('engine-status').className = 'engine-status-pill active';
-      $('engine-status-text').textContent = 'Đang hoạt động';
+      $('engine-status-text').textContent = 'Active';
 
       ctx = new AudioContext({ latencyHint: 'interactive' });
       const mic = await navigator.mediaDevices.getUserMedia({ audio: {
@@ -827,7 +1117,7 @@
       if (!ctx) return;
       const s = ctx.createBufferSource();
       s.buffer = await load(n); s.connect(soundGain);
-      s.start(ctx.currentTime + 0.3); // trễ 300ms cho PTT
+      s.start(ctx.currentTime + 0.3); // 300ms PTT buffer
 
       highlightPad(n);
       playing.add(s);
@@ -891,9 +1181,9 @@
         $('qr-lan').innerHTML = '';
         new QRCode($('qr-lan'), {
           text: primaryUrl,
-          width: 78,
-          height: 78,
-          colorDark: "#090d16",
+          width: 96,
+          height: 96,
+          colorDark: "#07090e",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.M
         });
@@ -917,50 +1207,42 @@
     }
 
     async function toggleTunnel() {
-      const btn = $('btn-tunnel-toggle');
-      const isRunning = btn.classList.contains('active');
-      btn.disabled = true;
-      btn.textContent = isRunning ? 'Đang tắt...' : 'Đang tạo...';
+      const isRunning = $('qr-tunnel-wrap').style.display === 'flex';
+      const enable = !isRunning;
 
+      showToast(enable ? 'Creating secure tunnel...' : 'Closing tunnel...');
       try {
-        const res = await fetch('/tunnel?enable=' + (isRunning ? '0' : '1'));
+        const res = await fetch('/tunnel?enable=' + (enable ? '1' : '0'));
         const data = await res.json();
-        btn.disabled = false;
         if (data.success && data.tunnelUrl) {
           showTunnelUrl(data.tunnelUrl);
         } else {
           hideTunnelUrl();
         }
       } catch (err) {
-        btn.disabled = false;
-        btn.textContent = 'Bật Chế Độ Đi Net';
-        alert('Lỗi đường hầm: ' + err.message);
+        alert('Tunnel error: ' + err.message);
       }
     }
 
     function showTunnelUrl(url) {
-      const btn = $('btn-tunnel-toggle');
-      btn.classList.add('active');
-      btn.textContent = 'Tắt Đi Net';
       $('qr-tunnel-wrap').style.display = 'flex';
+      $('tunnel-init-box').style.display = 'none';
       $('url-tunnel').textContent = url;
 
       $('qr-tunnel').innerHTML = '';
       new QRCode($('qr-tunnel'), {
         text: url,
-        width: 78,
-        height: 78,
-        colorDark: "#090d16",
+        width: 96,
+        height: 96,
+        colorDark: "#07090e",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M
       });
     }
 
     function hideTunnelUrl() {
-      const btn = $('btn-tunnel-toggle');
-      btn.classList.remove('active');
-      btn.textContent = 'Bật Chế Độ Đi Net';
       $('qr-tunnel-wrap').style.display = 'none';
+      $('tunnel-init-box').style.display = 'flex';
       $('url-tunnel').textContent = '';
     }
   </script>
