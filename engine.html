@@ -850,10 +850,11 @@
     let activeModalTarget = null;
     let isRecordingInModal = false;
 
-    // Rock-solid Audio State:
+    // Rock-solid Audio & Network State:
     let isEngineRunning = false;
     let micAudioElement = null;
     let micMediaStream = null;
+    let clientWs = null;
     const activeSounds = new Set(); // Tracks currently playing discrete sound instances
     const pendingTimeouts = new Set(); // Tracks pending 300ms PTT buffer timers
 
@@ -1255,6 +1256,8 @@
     function destroyAudio(audio) {
       if (!audio) return;
       try {
+        audio.onended = null;
+        audio.onerror = null;
         audio.pause();
         audio.removeAttribute('src');
         audio.load();
@@ -1342,7 +1345,7 @@
       pendingTimeouts.add(timerId);
     }
 
-    function stopAll() {
+    function stopAll(broadcastStop = true) {
       // Cancel all pending PTT buffer timeouts
       pendingTimeouts.forEach(tid => clearTimeout(tid));
       pendingTimeouts.clear();
@@ -1353,7 +1356,10 @@
       });
       activeSounds.clear();
       document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));
-      send({ stop: 1 });
+
+      if (broadcastStop) {
+        send({ stop: 1 });
+      }
     }
 
     function highlightPad(n) {
@@ -1367,8 +1373,14 @@
     }
 
     function connect() {
-      const ws = new WebSocket('ws://' + location.host);
-      ws.onmessage = e => {
+      try {
+        clientWs = new WebSocket('ws://' + location.host);
+      } catch (e) {
+        setTimeout(connect, 1000);
+        return;
+      }
+
+      clientWs.onmessage = e => {
         try {
           const m = JSON.parse(e.data);
           if (m.reload) loadSoundList();
@@ -1377,18 +1389,27 @@
             renderStreamDeck();
           }
           if (m.play) play(m.play);
-          if (m.stop) stopAll();
+          if (m.stop) stopAll(false); // Break loop: do not echo stop back to WebSocket
         } catch (err) {}
       };
-      ws.onclose = () => setTimeout(connect, 1000);
+
+      clientWs.onclose = () => {
+        clientWs = null;
+        setTimeout(connect, 1000);
+      };
+
+      clientWs.onerror = () => {
+        if (clientWs) {
+          try { clientWs.close(); } catch (e) {}
+        }
+      };
     }
 
-    const send = m => {
-      fetch('/list').then(() => {
-        const ws = new WebSocket('ws://' + location.host);
-        ws.onopen = () => { ws.send(JSON.stringify(m)); ws.close(); };
-      }).catch(() => {});
-    };
+    function send(m) {
+      if (clientWs && clientWs.readyState === WebSocket.OPEN) {
+        clientWs.send(JSON.stringify(m));
+      }
+    }
 
     /* Network & QR management */
     async function fetchNetworkInfo() {

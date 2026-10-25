@@ -1,0 +1,14 @@
+{
+  "stop": "num0",
+  "sounds": {
+    "discord-notification.mp3": "num1",
+    "faaah.mp3": "num2",
+    "kids-saying-yay-sound-effect_3.mp3": "num3",
+    "metal-pipe-clang.mp3": "num4",
+    "mlg-airhorn.mp3": "num5",
+    "oh-my-god-bro-oh-hell-nah-man.mp3": "num6",
+    "teleport.mp3": "num7",
+    "tf_nemesis.mp3": "num8",
+    "tuco-get-out.mp3": "num9"
+  }
+}

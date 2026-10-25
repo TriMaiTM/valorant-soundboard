@@ -371,6 +371,9 @@
             keybindMap = m.keybinds;
             renderButtons(searchInput.value);
           }
+          if (m.stop) {
+            document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));
+          }
         } catch (err) {}
       };
       ws.onclose = () => {
