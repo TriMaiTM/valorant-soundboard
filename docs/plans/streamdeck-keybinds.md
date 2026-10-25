@@ -59,6 +59,6 @@
 - Hiển thị nhãn phím tắt chính xác được cấu hình từ PC. [x]
 - Thêm hiệu ứng rung haptic và animation nảy phím xúc giác. [x]
 
-### Bước 4: Đóng Gói Lại Portable EXE & Cập Nhật GitHub [ ]
-- Chạy `npm run dist:portable` tạo bản EXE mới. [ ]
-- Commit, push lên GitHub nhánh `main`, tạo tag `v1.2.0`. [ ]
+### Bước 4: Đóng Gói Lại Portable EXE & Cập Nhật GitHub [x]
+- Chạy `npm run dist:portable` tạo bản EXE mới. [x]
+- Commit, push lên GitHub nhánh `main`, tạo tag `v1.2.0`. [x]
