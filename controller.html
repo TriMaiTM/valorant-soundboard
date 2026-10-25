@@ -178,8 +178,8 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 16px 12px;
-      min-height: 84px;
+      padding: 18px 12px 14px;
+      min-height: 88px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -215,6 +215,20 @@
       border-color: #38bdf8;
       background: rgba(56, 189, 248, 0.2);
       box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+    }
+
+    .hk-pill {
+      position: absolute;
+      top: 6px;
+      right: 8px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      font-family: monospace;
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      padding: 2px 5px;
+      border-radius: 4px;
     }
 
     .sound-title {
@@ -304,6 +318,7 @@
         <rect x="5" y="5" width="14" height="14" rx="3"></rect>
       </svg>
       DỪNG TẤT CẢ (STOP)
+      <span style="font-size: 0.75rem; opacity: 0.85; margin-left: 6px; font-weight: 800; background: rgba(0,0,0,0.3); padding: 2px 7px; border-radius: 4px;">Num 0</span>
     </button>
   </div>
 
@@ -323,8 +338,8 @@
 
     function formatName(filename) {
       return filename
-        .replace(/\.[^/.]+$/, '') // bỏ extension
-        .replace(/[-_]+/g, ' ')   // thay dấu gạch bằng khoảng trắng
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[-_]+/g, ' ')
         .trim();
     }
 
@@ -339,9 +354,13 @@
       }
 
       filtered.forEach(filename => {
+        const origIndex = allSounds.indexOf(filename);
+        const hotkeyLabel = origIndex >= 0 && origIndex < 9 ? `Num ${origIndex + 1}` : '';
+
         const btn = document.createElement('button');
         btn.className = 'sound-btn';
         btn.innerHTML = `
+          ${hotkeyLabel ? `<span class="hk-pill">${hotkeyLabel}</span>` : ''}
           <span class="sound-icon">🔊</span>
           <span class="sound-title">${formatName(filename)}</span>
         `;
@@ -372,6 +391,12 @@
       }
 
       ws.onopen = () => setStatus(true);
+      ws.onmessage = e => {
+        try {
+          const m = JSON.parse(e.data);
+          if (m.reload) loadSounds();
+        } catch (err) {}
+      };
       ws.onclose = () => {
         setStatus(false);
         setTimeout(connect, 1500);
@@ -400,17 +425,19 @@
       send({ stop: 1 });
     };
 
-    // Load initial sounds
-    fetch('/list')
-      .then(r => r.json())
-      .then(list => {
-        allSounds = list;
-        renderButtons();
-      })
-      .catch(() => {
-        gridEl.innerHTML = '<div class="empty-msg">Không thể tải danh sách âm thanh</div>';
-      });
+    function loadSounds() {
+      fetch('/list')
+        .then(r => r.json())
+        .then(list => {
+          allSounds = list;
+          renderButtons(searchInput.value);
+        })
+        .catch(() => {
+          gridEl.innerHTML = '<div class="empty-msg">Không thể tải danh sách âm thanh</div>';
+        });
+    }
 
+    loadSounds();
     connect();
   </script>
 </body>

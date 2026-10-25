@@ -1,18 +1,48 @@
 {
-  "name": "soundboard",
+  "name": "valorant-soundboard",
   "version": "1.0.0",
+  "description": "Soundboard cho Valorant với phím tắt NumPad toàn cục và điều khiển PWA trên điện thoại",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "dist:portable": "electron-builder --win portable"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "build": {
+    "appId": "com.trimaitm.valorantsoundboard",
+    "productName": "Valorant Soundboard",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "portable"
+    },
+    "portable": {
+      "artifactName": "Valorant-Soundboard-Portable.exe"
+    },
+    "files": [
+      "main.js",
+      "engine.html",
+      "controller.html",
+      "manifest.json",
+      "qrcode.min.js",
+      "icons/**/*",
+      "sounds/**/*"
+    ]
+  },
+  "keywords": [
+    "soundboard",
+    "valorant",
+    "electron",
+    "pwa"
+  ],
+  "author": "TriMaiTM",
+  "license": "MIT",
   "dependencies": {
-    "electron": "^45.0.0",
     "untun": "^0.2.2",
     "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "electron": "^45.0.0",
+    "electron-builder": "^26.7.0"
   }
 }
