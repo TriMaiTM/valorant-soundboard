@@ -3,26 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Valorant Soundboard Server</title>
+  <title>Valorant Stream Deck Soundboard</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
   
   <script src="/qrcode.min.js"></script>
 
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: rgba(20, 26, 45, 0.75);
+      --bg: #07090e;
+      --deck-bg: #0f1322;
+      --card-bg: rgba(18, 24, 43, 0.75);
       --card-border: rgba(99, 102, 241, 0.2);
       --accent: #6366f1;
-      --accent-glow: rgba(99, 102, 241, 0.3);
+      --accent-glow: rgba(99, 102, 241, 0.35);
       --emerald: #10b981;
       --emerald-glow: rgba(16, 185, 129, 0.35);
       --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.4);
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --amber: #f59e0b;
     }
 
     * {
@@ -34,13 +37,13 @@
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top right, #1a2240 0%, #0c101d 50%, var(--bg) 100%);
+      background: radial-gradient(circle at 85% 15%, #18203d 0%, #0c101d 50%, var(--bg) 100%);
       color: var(--text);
       min-height: 100vh;
-      padding: 20px;
+      padding: 16px 20px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
     }
 
     header {
@@ -61,35 +64,37 @@
       width: 40px;
       height: 40px;
       border-radius: 10px;
+      box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
     }
 
     .brand h1 {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 800;
       background: linear-gradient(135deg, #fff 30%, #a5b4fc);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      letter-spacing: -0.3px;
     }
 
     .brand p {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
-    .btn-folder {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+    .btn-action {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 999px;
       padding: 6px 14px;
       color: #cbd5e1;
       font-family: inherit;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
@@ -98,7 +103,7 @@
       transition: all 0.2s;
     }
 
-    .btn-folder:hover {
+    .btn-action:hover {
       background: rgba(99, 102, 241, 0.2);
       border-color: var(--accent);
       color: #fff;
@@ -110,7 +115,7 @@
       gap: 8px;
       padding: 6px 14px;
       border-radius: 999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 700;
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.3);
@@ -132,14 +137,15 @@
       box-shadow: 0 0 10px currentColor;
     }
 
-    .grid-container {
+    /* Top Grid: Audio setup & Mobile QR */
+    .top-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 14px;
     }
 
-    @media (max-width: 760px) {
-      .grid-container {
+    @media (max-width: 800px) {
+      .top-grid {
         grid-template-columns: 1fr;
       }
     }
@@ -148,15 +154,15 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 16px;
-      padding: 18px;
+      padding: 16px;
       backdrop-filter: blur(12px);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .card-title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       display: flex;
       align-items: center;
@@ -164,26 +170,32 @@
       color: #fff;
     }
 
+    .audio-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
 
     .form-group label {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 600;
       color: var(--text-muted);
     }
 
     select {
-      background: rgba(15, 20, 35, 0.8);
+      background: rgba(10, 14, 26, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      padding: 9px 12px;
+      border-radius: 8px;
+      padding: 8px 10px;
       color: #fff;
       font-family: inherit;
-      font-size: 0.83rem;
+      font-size: 0.8rem;
       outline: none;
       transition: border-color 0.2s;
     }
@@ -193,52 +205,46 @@
     }
 
     .btn-start {
-      margin-top: 6px;
       background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      padding: 12px;
+      border-radius: 10px;
+      padding: 10px;
       color: #fff;
       font-family: inherit;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 4px 18px var(--accent-glow);
+      box-shadow: 0 4px 16px var(--accent-glow);
       transition: all 0.2s ease;
-    }
-
-    .btn-start:hover {
-      filter: brightness(1.1);
-      transform: translateY(-1px);
     }
 
     .btn-start.running {
       background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      box-shadow: 0 4px 18px var(--emerald-glow);
+      box-shadow: 0 4px 16px var(--emerald-glow);
     }
 
-    /* Connect Card & QR */
+    /* Mobile Connect mini tab */
     .tab-nav {
       display: flex;
-      gap: 8px;
-      background: rgba(0, 0, 0, 0.25);
-      padding: 4px;
-      border-radius: 10px;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 3px;
+      border-radius: 8px;
     }
 
     .tab-btn {
       flex: 1;
       background: transparent;
       border: none;
-      border-radius: 8px;
-      padding: 7px;
+      border-radius: 6px;
+      padding: 5px;
       color: var(--text-muted);
       font-family: inherit;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
@@ -249,136 +255,247 @@
       color: #fff;
     }
 
-    .connect-view {
+    .connect-row {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      text-align: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .qr-box {
       background: #fff;
-      padding: 8px;
-      border-radius: 12px;
+      padding: 6px;
+      border-radius: 10px;
       display: inline-flex;
       justify-content: center;
       align-items: center;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-      min-width: 136px;
-      min-height: 136px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
     }
 
     .qr-box img, .qr-box canvas {
       display: block;
-      width: 120px;
-      height: 120px;
+      width: 78px;
+      height: 78px;
+    }
+
+    .connect-info {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow: hidden;
     }
 
     .url-display {
       background: rgba(0, 0, 0, 0.35);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 7px 10px;
-      font-size: 0.78rem;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 0.72rem;
       font-family: monospace;
       color: #38bdf8;
       word-break: break-all;
-      width: 100%;
     }
 
-    .tunnel-toggle-box {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 10px;
+    /* ======================================= */
+    /* STREAM DECK SECTION                     */
+    /* ======================================= */
+    .streamdeck-container {
+      background: #0b0f1d;
+      border: 2px solid rgba(99, 102, 241, 0.25);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.6), 0 8px 30px rgba(0,0,0,0.5);
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .btn-tunnel {
-      background: #f59e0b;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      padding: 7px 14px;
-      font-family: inherit;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-tunnel.active {
-      background: #ef4444;
-      color: #fff;
-    }
-
-    /* Hotkey list panel */
-    .hotkey-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 8px;
-      max-height: 160px;
-      overflow-y: auto;
-      padding-right: 4px;
-    }
-
-    .hotkey-item {
-      background: rgba(0, 0, 0, 0.25);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 8px;
-      padding: 6px 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.78rem;
-      transition: all 0.2s;
-    }
-
-    .hotkey-item.active {
-      background: rgba(56, 189, 248, 0.25);
-      border-color: #38bdf8;
-      color: #38bdf8;
-    }
-
-    .hotkey-badge {
-      background: rgba(99, 102, 241, 0.3);
-      border: 1px solid rgba(99, 102, 241, 0.4);
-      color: #a5b4fc;
-      border-radius: 5px;
-      padding: 2px 6px;
-      font-size: 0.7rem;
-      font-weight: 800;
-      font-family: monospace;
-      flex-shrink: 0;
-    }
-
-    .hotkey-badge.stop {
-      background: rgba(239, 68, 68, 0.25);
-      border-color: rgba(239, 68, 68, 0.4);
-      color: #fca5a5;
-    }
-
-    .hotkey-name {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      gap: 14px;
       flex: 1;
     }
 
-    /* Footer info */
-    footer {
-      font-size: 0.75rem;
-      color: var(--text-muted);
+    .deck-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .deck-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #e2e8f0;
+      letter-spacing: 0.2px;
+    }
+
+    .deck-hint {
+      font-size: 0.75rem;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Grid of LCD Key Pads */
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+      gap: 14px;
+      overflow-y: auto;
+      max-height: 380px;
+      padding: 4px;
+    }
+
+    /* Key Pad */
+    .deck-pad {
+      background: linear-gradient(145deg, #182035 0%, #101626 100%);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      height: 125px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.15);
+      transition: all 0.15s ease;
+      overflow: hidden;
+    }
+
+    .deck-pad::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15), transparent 70%);
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .deck-pad:hover {
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(99, 102, 241, 0.2);
+    }
+
+    .deck-pad:active {
+      transform: scale(0.96);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .deck-pad.playing {
+      border-color: #38bdf8;
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.45), inset 0 0 15px rgba(56, 189, 248, 0.3);
+      animation: pulse 0.5s ease infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(0.98); }
+      to { transform: scale(1.02); }
+    }
+
+    .pad-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Hotkey badge on pad */
+    .key-badge {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      transition: all 0.2s;
+    }
+
+    .key-badge:hover {
+      background: var(--accent);
+      color: #fff;
+      border-color: #fff;
+    }
+
+    .key-badge.recording {
+      background: #f59e0b;
+      color: #000;
+      border-color: #f59e0b;
+      box-shadow: 0 0 12px #f59e0b;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .pad-icon {
+      font-size: 1.4rem;
+      text-align: center;
+      margin: auto 0;
+      opacity: 0.9;
+    }
+
+    .pad-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1.25;
+      text-align: center;
+      word-break: break-word;
+      color: #e2e8f0;
+      text-transform: capitalize;
+    }
+
+    /* Emergency Stop Pad */
+    .deck-pad.stop-pad {
+      background: linear-gradient(145deg, #3f1212 0%, #1f0808 100%);
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .deck-pad.stop-pad:hover {
+      border-color: #ef4444;
+      box-shadow: 0 10px 22px rgba(239, 68, 68, 0.3);
+    }
+
+    .deck-pad.stop-pad .key-badge {
+      border-color: rgba(239, 68, 68, 0.5);
+      color: #fca5a5;
+    }
+
+    .deck-pad.stop-pad .pad-title {
+      color: #f87171;
+    }
+
+    /* Toast notification */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e1b4b;
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+      transition: all 0.25s ease;
+      z-index: 999;
+    }
+
+    #toast.show {
+      opacity: 1;
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -388,13 +505,16 @@
     <div class="brand">
       <img src="/icons/icon.svg" alt="Logo">
       <div>
-        <h1>Valorant Soundboard</h1>
-        <p>Phím tắt NumPad toàn cục & Điều khiển PWA</p>
+        <h1>Valorant Stream Deck</h1>
+        <p>Bộ trộn âm thanh & Phím tắt In-Game toàn cục</p>
       </div>
     </div>
     <div class="header-actions">
-      <button class="btn-folder" onclick="openSoundsFolder()">
-        📂 Mở Thư Mục Sounds
+      <button class="btn-action" onclick="openSoundsFolder()">
+        📂 Thư Mục Sounds
+      </button>
+      <button class="btn-action" onclick="resetDefaultKeybinds()">
+        🔄 Reset Phím NumPad
       </button>
       <div id="engine-status" class="engine-status-pill">
         <span class="dot"></span>
@@ -403,60 +523,55 @@
     </div>
   </header>
 
-  <div class="grid-container">
-    <!-- Cột 1: Cấu hình Thiết bị Âm thanh -->
+  <!-- Top Config Row -->
+  <div class="top-grid">
+    <!-- Card Âm Thanh -->
     <div class="card">
       <div class="card-title">
-        <span>🎧</span> Thiết Lập Định Tuyến Âm Thanh
+        <span>🎧</span> Thiết Lập Định Tuyến (Audio Router)
       </div>
-
-      <div class="form-group">
-        <label for="mic">Micro Thật (Giọng của bạn):</label>
-        <select id="mic"></select>
+      <div class="audio-row">
+        <div class="form-group">
+          <label for="mic">Mic Thật:</label>
+          <select id="mic"></select>
+        </div>
+        <div class="form-group">
+          <label for="out">Xuất Ra (CABLE Input):</label>
+          <select id="out"></select>
+        </div>
+        <div class="form-group">
+          <label for="mon">Tai Nghe (Nghe Lại):</label>
+          <select id="mon"></select>
+        </div>
       </div>
-
-      <div class="form-group">
-        <label for="out">Xuất Ra (Chọn CABLE Input):</label>
-        <select id="out"></select>
-      </div>
-
-      <div class="form-group">
-        <label for="mon">Nghe Lại (Tai nghe của bạn):</label>
-        <select id="mon"></select>
-      </div>
-
       <button id="start" class="btn-start">
-        <span id="start-btn-text">BẮT ĐẦU SOUNDBOARD (START)</span>
+        <span id="start-btn-text">BẮT ĐẦU SOUNDBOARD (START ENGINE)</span>
       </button>
     </div>
 
-    <!-- Cột 2: Kết nối Điện thoại (PWA & QR Code) -->
+    <!-- Card Kết Nối Mobile -->
     <div class="card">
-      <div class="card-title">
-        <span>📱</span> Kết Nối Điện Thoại (Quét QR)
-      </div>
-
-      <div class="tab-nav">
-        <button id="tab-lan" class="tab-btn active" onclick="switchTab('lan')">Ở Nhà (Wi-Fi / LAN)</button>
-        <button id="tab-tunnel" class="tab-btn" onclick="switchTab('tunnel')">Đi Quán Net (4G / Online)</button>
-      </div>
-
-      <!-- Tab LAN -->
-      <div id="view-lan" class="connect-view">
-        <div id="qr-lan" class="qr-box"></div>
-        <p style="font-size: 0.78rem; color: var(--text-muted)">Mở Camera iPhone/Android quét mã để vào PWA:</p>
-        <div id="url-lan" class="url-display">Đang lấy link LAN...</div>
-      </div>
-
-      <!-- Tab Đi Net (Tunnel) -->
-      <div id="view-tunnel" class="connect-view" style="display: none;">
-        <div class="tunnel-toggle-box">
-          <p style="font-size: 0.78rem; color: #cbd5e1">Bật đường hầm an toàn khi đi Net hoặc điện thoại dùng 4G:</p>
-          <button id="btn-tunnel-toggle" class="btn-tunnel" onclick="toggleTunnel()">
-            Bật Chế Độ Đi Net
-          </button>
+      <div class="card-title" style="justify-content: space-between;">
+        <span>📱 Điều Khiển Điện Thoại</span>
+        <div class="tab-nav">
+          <button id="tab-lan" class="tab-btn active" onclick="switchTab('lan')">Wi-Fi (Ở Nhà)</button>
+          <button id="tab-tunnel" class="tab-btn" onclick="switchTab('tunnel')">4G / Quán Net</button>
         </div>
-        <div id="qr-tunnel-wrap" style="display: none; flex-direction: column; align-items: center; gap: 8px; width: 100%;">
+      </div>
+
+      <div id="view-lan" class="connect-row">
+        <div id="qr-lan" class="qr-box"></div>
+        <div class="connect-info">
+          <p style="font-size: 0.74rem; color: var(--text-muted)">Quét mã để mở Stream Deck trên điện thoại:</p>
+          <div id="url-lan" class="url-display">Đang lấy link...</div>
+        </div>
+      </div>
+
+      <div id="view-tunnel" class="connect-row" style="display: none;">
+        <button id="btn-tunnel-toggle" class="btn-action" style="background:#f59e0b; color:#000;" onclick="toggleTunnel()">
+          Bật Chế Độ Đi Net
+        </button>
+        <div id="qr-tunnel-wrap" style="display: none; align-items: center; gap: 8px;">
           <div id="qr-tunnel" class="qr-box"></div>
           <div id="url-tunnel" class="url-display"></div>
         </div>
@@ -464,28 +579,29 @@
     </div>
   </div>
 
-  <!-- Bảng Phím Tắt Toàn Cục (In-Game Valorant) -->
-  <div class="card">
-    <div class="card-title" style="justify-content: space-between;">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span>⌨️</span> Phím Tắt NumPad Toàn Cục (Bấm trực tiếp khi đang bắn Valorant)
+  <!-- BÀN PHÍM STREAM DECK -->
+  <div class="streamdeck-container">
+    <div class="deck-header">
+      <div class="deck-title">
+        <span>🎛️</span> BÀN ĐIỀU KHIỂN STREAM DECK
       </div>
-      <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal;">Tự động gán theo thứ tự file trong thư mục sounds</span>
+      <div class="deck-hint">
+        <span>💡 Nhấp vào ô [ Phím ] trên từng nút để bấm gán phím tắt mới</span>
+      </div>
     </div>
-    <div id="hotkey-grid" class="hotkey-list"></div>
+
+    <div id="deck-grid" class="deck-grid">
+      <!-- Các phím Stream Deck được render tự động -->
+    </div>
   </div>
 
-  <footer>
-    <span id="sound-count">Đang nạp âm thanh...</span>
-    <span>💡 Mẹo: Bấm [NumPad 0] bất kỳ lúc nào để Dừng Tất Cả âm thanh</span>
-  </footer>
+  <div id="toast"></div>
 
   <script>
     const $ = id => document.getElementById(id);
     let ctx, soundGain, cache = {}, playing = new Set();
-    let networkData = null;
-    let qrLanObj = null, qrTunnelObj = null;
-    let soundList = [];
+    let networkData = null, soundList = [], keybindMap = { stop: 'num0', sounds: {} };
+    let recordingTarget = null; // null, 'stop', hoặc 'filename.mp3'
 
     const fill = (sel, list) => sel.innerHTML =
       list.map(d => `<option value="${d.deviceId}">${d.label || 'Default Device'}</option>`).join('');
@@ -497,28 +613,30 @@
         fill($('mic'), devs.filter(d => d.kind === 'audioinput'));
         fill($('out'), devs.filter(d => d.kind === 'audiooutput'));
         fill($('mon'), devs.filter(d => d.kind === 'audiooutput'));
-      } catch (e) {
-        console.error('Lỗi lấy thiết bị audio:', e);
-      }
+      } catch (e) {}
+
       fetchNetworkInfo();
-      loadSoundList();
+      await fetchKeybinds();
+      await loadSoundList();
       connect();
     })();
 
     async function openSoundsFolder() {
+      try { await fetch('/open-sounds-dir'); } catch (e) {}
+    }
+
+    async function fetchKeybinds() {
       try {
-        await fetch('/open-sounds-dir');
-      } catch (e) {
-        alert('Không thể mở thư mục: ' + e.message);
-      }
+        const r = await fetch('/keybinds');
+        keybindMap = await r.json();
+      } catch (e) {}
     }
 
     async function loadSoundList() {
       try {
         const r = await fetch('/list');
         soundList = await r.json();
-        $('sound-count').textContent = `Đã nạp ${soundList.length} âm thanh sẵn sàng`;
-        renderHotkeys();
+        renderStreamDeck();
         if (ctx) {
           for (const n of soundList) await load(n);
         }
@@ -529,33 +647,150 @@
       return n.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ').trim();
     }
 
-    function renderHotkeys() {
-      const container = $('hotkey-grid');
-      container.innerHTML = `
-        <div class="hotkey-item" id="hk-0">
-          <span class="hotkey-badge stop">Num 0</span>
-          <span class="hotkey-name">DỪNG TẤT CẢ (STOP)</span>
-        </div>
-      `;
+    function renderStreamDeck() {
+      const grid = $('deck-grid');
+      grid.innerHTML = '';
 
-      soundList.forEach((filename, idx) => {
-        const item = document.createElement('div');
-        item.className = 'hotkey-item';
-        item.id = 'hk-' + encodeURIComponent(filename);
-        const numLabel = idx < 9 ? `Num ${idx + 1}` : 'Mobile';
-        item.innerHTML = `
-          <span class="hotkey-badge">${numLabel}</span>
-          <span class="hotkey-name" title="${filename}">${formatName(filename)}</span>
+      // 1. Phím STOP ALL
+      const stopPad = document.createElement('div');
+      stopPad.className = 'deck-pad stop-pad';
+      stopPad.id = 'pad-stop';
+      const stopKey = keybindMap.stop || 'num0';
+      stopPad.innerHTML = `
+        <div class="pad-top">
+          <span class="key-badge ${recordingTarget === 'stop' ? 'recording' : ''}" onclick="startRecordKey(event, 'stop')">
+            ${recordingTarget === 'stop' ? 'Bấm phím...' : stopKey}
+          </span>
+          <span style="font-size:0.75rem; color:#f87171">🛑</span>
+        </div>
+        <div class="pad-icon">⏹️</div>
+        <div class="pad-title">DỪNG TẤT CẢ</div>
+      `;
+      stopPad.onclick = (e) => {
+        if (e.target.classList.contains('key-badge')) return;
+        stopAll();
+      };
+      grid.appendChild(stopPad);
+
+      // 2. Các phím Sound Pads
+      soundList.forEach((filename) => {
+        const pad = document.createElement('div');
+        pad.className = 'deck-pad';
+        pad.id = 'pad-' + encodeURIComponent(filename);
+        const assignedKey = keybindMap.sounds[filename] || 'Chưa gán';
+
+        pad.innerHTML = `
+          <div class="pad-top">
+            <span class="key-badge ${recordingTarget === filename ? 'recording' : ''}" onclick="startRecordKey(event, '${encodeURIComponent(filename)}')">
+              ${recordingTarget === filename ? 'Bấm phím...' : assignedKey}
+            </span>
+            <span style="font-size:0.75rem; color:#818cf8">🔊</span>
+          </div>
+          <div class="pad-icon">🎵</div>
+          <div class="pad-title" title="${filename}">${formatName(filename)}</div>
         `;
-        container.appendChild(item);
+
+        pad.onclick = (e) => {
+          if (e.target.classList.contains('key-badge')) return;
+          send({ play: filename });
+        };
+        grid.appendChild(pad);
       });
     }
 
+    /* Keybind Recording */
+    function startRecordKey(e, targetId) {
+      e.stopPropagation();
+      recordingTarget = decodeURIComponent(targetId);
+      renderStreamDeck();
+      showToast(`Đang gán phím: Hãy nhấn phím bất kỳ trên bàn phím (Esc để hủy, Backspace để xóa)`);
+    }
+
+    window.addEventListener('keydown', async (e) => {
+      if (!recordingTarget) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (e.key === 'Escape') {
+        recordingTarget = null;
+        renderStreamDeck();
+        showToast('Đã hủy gán phím');
+        return;
+      }
+
+      let keyStr = '';
+
+      if (e.key === 'Backspace' || e.key === 'Delete') {
+        keyStr = ''; // Xóa phím tắt
+      } else {
+        const parts = [];
+        if (e.ctrlKey) parts.push('CommandOrControl');
+        if (e.altKey) parts.push('Alt');
+        if (e.shiftKey) parts.push('Shift');
+
+        // Phím NumPad
+        if (e.code.startsWith('Numpad')) {
+          parts.push(e.code.toLowerCase().replace('pad', '')); // Numpad1 -> num1
+        } else if (/^F[1-9][0-2]?$/.test(e.code)) {
+          parts.push(e.code); // F1 - F12
+        } else if (e.code.startsWith('Key')) {
+          parts.push(e.code.replace('Key', '')); // A, B, C...
+        } else if (e.code.startsWith('Digit')) {
+          parts.push(e.code.replace('Digit', '')); // 1, 2, 3...
+        } else if (['Space', 'Tab', 'Home', 'End', 'PageUp', 'PageDown', 'Insert'].includes(e.code)) {
+          parts.push(e.code);
+        } else {
+          parts.push(e.key.toUpperCase());
+        }
+
+        keyStr = parts.join('+');
+      }
+
+      const target = recordingTarget;
+      recordingTarget = null;
+
+      try {
+        const payload = target === 'stop' ? { stop: keyStr } : { filename: target, key: keyStr };
+        const res = await fetch('/keybinds', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          keybindMap = data.keybinds;
+          renderStreamDeck();
+          showToast(`Đã gán [ ${keyStr || 'Không có'} ] cho ${target === 'stop' ? 'Dừng Tất Cả' : formatName(target)}`);
+        }
+      } catch (err) {
+        alert('Lỗi lưu phím tắt: ' + err.message);
+      }
+    }, true);
+
+    async function resetDefaultKeybinds() {
+      if (!confirm('Bạn có muốn đặt lại phím tắt về mặc định NumPad 0 - 9 không?')) return;
+      try {
+        const res = await fetch('/keybinds/reset', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          keybindMap = data.keybinds;
+          renderStreamDeck();
+          showToast('Đã đặt lại phím tắt NumPad mặc định!');
+        }
+      } catch (e) {}
+    }
+
+    function showToast(msg) {
+      const t = $('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    /* Web Audio & Routing */
     async function route(stream, id) {
       const a = new Audio(); a.srcObject = stream;
-      if (typeof a.setSinkId === 'function') {
-        await a.setSinkId(id);
-      }
+      if (typeof a.setSinkId === 'function') await a.setSinkId(id);
       await a.play();
     }
 
@@ -563,7 +798,7 @@
       if (ctx) return;
       $('start').disabled = true;
       $('start').classList.add('running');
-      $('start-btn-text').textContent = 'ĐANG CHẠY (ENGINE ACTIVE)';
+      $('start-btn-text').textContent = 'ENGINE ĐANG CHẠY (ACTIVE)';
       $('engine-status').className = 'engine-status-pill active';
       $('engine-status-text').textContent = 'Đang hoạt động';
 
@@ -592,24 +827,30 @@
       if (!ctx) return;
       const s = ctx.createBufferSource();
       s.buffer = await load(n); s.connect(soundGain);
-      s.start(ctx.currentTime + 0.3); // trễ 300 ms để kịp giữ PTT
+      s.start(ctx.currentTime + 0.3); // trễ 300ms cho PTT
 
-      highlightPlaying(n);
+      highlightPad(n);
       playing.add(s);
       s.onended = () => {
         playing.delete(s);
-        unhighlightPlaying(n);
+        unhighlightPad(n);
       };
     }
 
-    function highlightPlaying(n) {
-      const el = document.getElementById('hk-' + encodeURIComponent(n));
-      if (el) el.classList.add('active');
+    function stopAll() {
+      playing.forEach(s => s.stop());
+      document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));
+      send({ stop: 1 });
     }
 
-    function unhighlightPlaying(n) {
-      const el = document.getElementById('hk-' + encodeURIComponent(n));
-      if (el) el.classList.remove('active');
+    function highlightPad(n) {
+      const el = document.getElementById('pad-' + encodeURIComponent(n));
+      if (el) el.classList.add('playing');
+    }
+
+    function unhighlightPad(n) {
+      const el = document.getElementById('pad-' + encodeURIComponent(n));
+      if (el) el.classList.remove('playing');
     }
 
     function connect() {
@@ -618,16 +859,28 @@
         try {
           const m = JSON.parse(e.data);
           if (m.reload) loadSoundList();
+          if (m.reloadKeybinds && m.keybinds) {
+            keybindMap = m.keybinds;
+            renderStreamDeck();
+          }
           if (m.play) play(m.play);
           if (m.stop) {
             playing.forEach(s => s.stop());
-            document.querySelectorAll('.hotkey-item').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));
           }
         } catch (err) {}
       };
       ws.onclose = () => setTimeout(connect, 1000);
     }
 
+    const send = m => {
+      fetch('/list').then(() => {
+        const ws = new WebSocket('ws://' + location.host);
+        ws.onopen = () => { ws.send(JSON.stringify(m)); ws.close(); };
+      }).catch(() => {});
+    };
+
+    /* Network & QR management */
     async function fetchNetworkInfo() {
       try {
         const res = await fetch('/network-info');
@@ -636,18 +889,16 @@
         $('url-lan').textContent = primaryUrl;
 
         $('qr-lan').innerHTML = '';
-        qrLanObj = new QRCode($('qr-lan'), {
+        new QRCode($('qr-lan'), {
           text: primaryUrl,
-          width: 120,
-          height: 120,
+          width: 78,
+          height: 78,
           colorDark: "#090d16",
           colorLight: "#ffffff",
           correctLevel: QRCode.CorrectLevel.M
         });
 
-        if (networkData.tunnelUrl) {
-          showTunnelUrl(networkData.tunnelUrl);
-        }
+        if (networkData.tunnelUrl) showTunnelUrl(networkData.tunnelUrl);
       } catch (err) {}
     }
 
@@ -669,13 +920,12 @@
       const btn = $('btn-tunnel-toggle');
       const isRunning = btn.classList.contains('active');
       btn.disabled = true;
-      btn.textContent = isRunning ? 'Đang tắt đường hầm...' : 'Đang khởi tạo đường hầm...';
+      btn.textContent = isRunning ? 'Đang tắt...' : 'Đang tạo...';
 
       try {
         const res = await fetch('/tunnel?enable=' + (isRunning ? '0' : '1'));
         const data = await res.json();
         btn.disabled = false;
-
         if (data.success && data.tunnelUrl) {
           showTunnelUrl(data.tunnelUrl);
         } else {
@@ -683,7 +933,7 @@
         }
       } catch (err) {
         btn.disabled = false;
-        btn.textContent = isRunning ? 'Tắt Chế Độ Đi Net' : 'Bật Chế Độ Đi Net';
+        btn.textContent = 'Bật Chế Độ Đi Net';
         alert('Lỗi đường hầm: ' + err.message);
       }
     }
@@ -691,15 +941,15 @@
     function showTunnelUrl(url) {
       const btn = $('btn-tunnel-toggle');
       btn.classList.add('active');
-      btn.textContent = 'Tắt Chế Độ Đi Net';
+      btn.textContent = 'Tắt Đi Net';
       $('qr-tunnel-wrap').style.display = 'flex';
       $('url-tunnel').textContent = url;
 
       $('qr-tunnel').innerHTML = '';
-      qrTunnelObj = new QRCode($('qr-tunnel'), {
+      new QRCode($('qr-tunnel'), {
         text: url,
-        width: 120,
-        height: 120,
+        width: 78,
+        height: 78,
         colorDark: "#090d16",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M

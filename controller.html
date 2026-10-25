@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Soundboard Controller</title>
+  <title>Stream Deck Controller</title>
   
   <!-- PWA Meta Tags -->
   <link rel="manifest" href="/manifest.json">
@@ -11,27 +11,26 @@
   <link rel="apple-touch-icon" href="/icons/icon.svg">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Soundboard">
-  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-title" content="StreamDeck">
+  <meta name="theme-color" content="#07090e">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg: #090d16;
-      --card-bg: rgba(22, 27, 46, 0.75);
-      --card-border: rgba(99, 102, 241, 0.2);
-      --card-active: #4f46e5;
+      --bg: #07090e;
+      --deck-frame: #0e1322;
+      --pad-bg: linear-gradient(145deg, #182238 0%, #101726 100%);
+      --pad-border: rgba(255, 255, 255, 0.1);
       --accent: #6366f1;
-      --accent-glow: rgba(99, 102, 241, 0.35);
+      --accent-glow: rgba(99, 102, 241, 0.4);
       --danger: #ef4444;
-      --danger-glow: rgba(239, 68, 68, 0.4);
+      --danger-glow: rgba(239, 68, 68, 0.45);
       --text: #f1f5f9;
       --text-muted: #94a3b8;
-      --success: #10b981;
     }
 
     * {
@@ -44,10 +43,10 @@
 
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: radial-gradient(circle at top, #151c33 0%, var(--bg) 100%);
+      background: radial-gradient(circle at 50% 0%, #17203b 0%, var(--bg) 85%);
       color: var(--text);
       min-height: 100vh;
-      padding: env(safe-area-inset-top, 16px) 16px calc(env(safe-area-inset-bottom, 16px) + 90px);
+      padding: env(safe-area-inset-top, 14px) 14px calc(env(safe-area-inset-bottom, 14px) + 84px);
       display: flex;
       flex-direction: column;
     }
@@ -57,7 +56,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 4px 16px;
+      padding: 6px 4px 14px;
     }
 
     .brand {
@@ -67,13 +66,13 @@
     }
 
     .brand img {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 8px;
     }
 
     .brand h1 {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 800;
       letter-spacing: -0.3px;
       background: linear-gradient(135deg, #fff 40%, #a5b4fc);
@@ -85,9 +84,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 5px 12px;
+      padding: 4px 10px;
       border-radius: 999px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -96,12 +95,11 @@
     }
 
     .status-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: #f59e0b;
       box-shadow: 0 0 8px #f59e0b;
-      transition: all 0.3s ease;
     }
 
     .status-badge.connected {
@@ -126,7 +124,7 @@
 
     /* Search bar */
     .search-wrap {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       position: relative;
     }
 
@@ -135,9 +133,9 @@
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
-      padding: 12px 14px 12px 40px;
+      padding: 10px 14px 10px 38px;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-family: inherit;
       outline: none;
       transition: all 0.2s ease;
@@ -151,7 +149,7 @@
 
     .search-icon {
       position: absolute;
-      left: 14px;
+      left: 12px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
@@ -159,7 +157,7 @@
       display: flex;
     }
 
-    /* Sound Grid */
+    /* Stream Deck LCD Grid */
     #g {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -173,94 +171,82 @@
       }
     }
 
-    .sound-btn {
+    .deck-pad {
       position: relative;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 18px 12px 14px;
-      min-height: 88px;
+      background: var(--pad-bg);
+      border: 2px solid var(--pad-border);
+      border-radius: 18px;
+      padding: 12px 10px;
+      min-height: 100px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
       text-align: center;
-      gap: 6px;
-      color: var(--text);
       cursor: pointer;
-      backdrop-filter: blur(10px);
-      transition: transform 0.12s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.45), inset 0 1px 1px rgba(255,255,255,0.12);
+      transition: transform 0.1s ease, border-color 0.2s ease, box-shadow 0.2s ease;
       overflow: hidden;
     }
 
-    .sound-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.8), transparent);
-      opacity: 0.5;
-    }
-
-    .sound-btn:active {
-      transform: scale(0.95);
-      background: rgba(79, 70, 229, 0.35);
+    .deck-pad:active {
+      transform: scale(0.94);
       border-color: #818cf8;
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: 0 0 18px var(--accent-glow);
     }
 
-    .sound-btn.playing {
+    .deck-pad.playing {
       border-color: #38bdf8;
-      background: rgba(56, 189, 248, 0.2);
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.45);
+      background: linear-gradient(145deg, #1a2c4a 0%, #101c2e 100%);
     }
 
-    .hk-pill {
+    .pad-key-tag {
       position: absolute;
-      top: 6px;
+      top: 8px;
       right: 8px;
-      font-size: 0.65rem;
-      font-weight: 800;
-      font-family: monospace;
-      background: rgba(99, 102, 241, 0.25);
-      border: 1px solid rgba(99, 102, 241, 0.4);
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(99, 102, 241, 0.35);
       color: #a5b4fc;
-      padding: 2px 5px;
-      border-radius: 4px;
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
     }
 
-    .sound-title {
-      font-size: 0.85rem;
+    .pad-icon {
+      font-size: 1.3rem;
+      margin-top: 4px;
+      opacity: 0.9;
+    }
+
+    .pad-title {
+      font-size: 0.82rem;
       font-weight: 700;
       line-height: 1.25;
       word-break: break-word;
+      color: #e2e8f0;
       text-transform: capitalize;
     }
 
-    .sound-icon {
-      font-size: 1.1rem;
-      opacity: 0.85;
-    }
-
-    /* Fixed Bottom Action: Stop All */
+    /* Fixed Bottom Action: Stream Deck Emergency Stop */
     .bottom-bar {
       position: fixed;
-      left: 16px;
-      right: 16px;
-      bottom: calc(env(safe-area-inset-bottom, 16px) + 8px);
+      left: 14px;
+      right: 14px;
+      bottom: calc(env(safe-area-inset-bottom, 14px) + 8px);
       z-index: 100;
     }
 
     #stop {
       width: 100%;
-      height: 58px;
-      background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
+      height: 54px;
+      background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 14px;
       color: #fff;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 800;
       font-family: inherit;
       letter-spacing: 0.5px;
@@ -269,13 +255,12 @@
       align-items: center;
       gap: 8px;
       cursor: pointer;
-      box-shadow: 0 8px 24px var(--danger-glow);
-      transition: transform 0.12s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 20px var(--danger-glow);
+      transition: transform 0.1s ease;
     }
 
     #stop:active {
       transform: scale(0.97);
-      box-shadow: 0 4px 12px var(--danger-glow);
     }
 
     .empty-msg {
@@ -283,7 +268,7 @@
       text-align: center;
       padding: 40px 16px;
       color: var(--text-muted);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
   </style>
 </head>
@@ -292,7 +277,7 @@
   <header>
     <div class="brand">
       <img src="/icons/icon.svg" alt="Logo">
-      <h1>Soundboard</h1>
+      <h1>Stream Deck</h1>
     </div>
     <div id="status" class="status-badge disconnected">
       <span class="status-dot"></span>
@@ -302,29 +287,30 @@
 
   <div class="search-wrap">
     <div class="search-icon">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
         <circle cx="11" cy="11" r="8"></circle>
         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
       </svg>
     </div>
-    <input type="text" id="search" class="search-input" placeholder="Tìm âm thanh..." autocomplete="off">
+    <input type="text" id="search" class="search-input" placeholder="Tìm âm thanh trên deck..." autocomplete="off">
   </div>
 
   <div id="g"></div>
 
   <div class="bottom-bar">
     <button id="stop">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
         <rect x="5" y="5" width="14" height="14" rx="3"></rect>
       </svg>
       DỪNG TẤT CẢ (STOP)
-      <span style="font-size: 0.75rem; opacity: 0.85; margin-left: 6px; font-weight: 800; background: rgba(0,0,0,0.3); padding: 2px 7px; border-radius: 4px;">Num 0</span>
+      <span id="stop-key-badge" style="font-size: 0.72rem; opacity: 0.9; margin-left: 6px; font-weight: 800; background: rgba(0,0,0,0.35); padding: 2px 7px; border-radius: 4px; font-family: monospace;">num0</span>
     </button>
   </div>
 
   <script>
     let ws;
     let allSounds = [];
+    let keybindMap = { stop: 'num0', sounds: {} };
     const statusEl = document.getElementById('status');
     const statusTextEl = document.getElementById('status-text');
     const gridEl = document.getElementById('g');
@@ -337,10 +323,7 @@
     }
 
     function formatName(filename) {
-      return filename
-        .replace(/\.[^/.]+$/, '')
-        .replace(/[-_]+/g, ' ')
-        .trim();
+      return filename.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ').trim();
     }
 
     function renderButtons(filter = '') {
@@ -354,16 +337,16 @@
       }
 
       filtered.forEach(filename => {
-        const origIndex = allSounds.indexOf(filename);
-        const hotkeyLabel = origIndex >= 0 && origIndex < 9 ? `Num ${origIndex + 1}` : '';
+        const assignedKey = keybindMap.sounds ? (keybindMap.sounds[filename] || '') : '';
 
-        const btn = document.createElement('button');
-        btn.className = 'sound-btn';
+        const btn = document.createElement('div');
+        btn.className = 'deck-pad';
         btn.innerHTML = `
-          ${hotkeyLabel ? `<span class="hk-pill">${hotkeyLabel}</span>` : ''}
-          <span class="sound-icon">🔊</span>
-          <span class="sound-title">${formatName(filename)}</span>
+          ${assignedKey ? `<span class="pad-key-tag">${assignedKey}</span>` : ''}
+          <div class="pad-icon">🎵</div>
+          <div class="pad-title">${formatName(filename)}</div>
         `;
+
         btn.onclick = () => {
           vibrate(30);
           btn.classList.add('playing');
@@ -372,6 +355,10 @@
         };
         gridEl.appendChild(btn);
       });
+
+      if (keybindMap.stop) {
+        document.getElementById('stop-key-badge').textContent = keybindMap.stop;
+      }
     }
 
     searchInput.addEventListener('input', (e) => {
@@ -394,7 +381,11 @@
       ws.onmessage = e => {
         try {
           const m = JSON.parse(e.data);
-          if (m.reload) loadSounds();
+          if (m.reload) loadAll();
+          if (m.reloadKeybinds && m.keybinds) {
+            keybindMap = m.keybinds;
+            renderButtons(searchInput.value);
+          }
         } catch (err) {}
       };
       ws.onclose = () => {
@@ -407,7 +398,7 @@
     function setStatus(online) {
       if (online) {
         statusEl.className = 'status-badge connected';
-        statusTextEl.textContent = 'Đã kết nối';
+        statusTextEl.textContent = 'Trực tuyến';
       } else {
         statusEl.className = 'status-badge disconnected';
         statusTextEl.textContent = 'Mất kết nối';
@@ -425,19 +416,21 @@
       send({ stop: 1 });
     };
 
-    function loadSounds() {
-      fetch('/list')
-        .then(r => r.json())
-        .then(list => {
-          allSounds = list;
-          renderButtons(searchInput.value);
-        })
-        .catch(() => {
-          gridEl.innerHTML = '<div class="empty-msg">Không thể tải danh sách âm thanh</div>';
-        });
+    async function loadAll() {
+      try {
+        const [soundsRes, keyRes] = await Promise.all([
+          fetch('/list'),
+          fetch('/keybinds')
+        ]);
+        allSounds = await soundsRes.json();
+        keybindMap = await keyRes.json();
+        renderButtons(searchInput.value);
+      } catch (e) {
+        gridEl.innerHTML = '<div class="empty-msg">Không thể tải danh sách âm thanh</div>';
+      }
     }
 
-    loadSounds();
+    loadAll();
     connect();
   </script>
 </body>

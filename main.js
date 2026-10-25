@@ -29,33 +29,79 @@ function getSoundsDir() {
   return path.join(__dirname, 'sounds');
 }
 
+function getKeybindsFilePath() {
+  if (app.isPackaged) {
+    const portablePath = process.env.PORTABLE_EXECUTABLE_FILE || process.execPath;
+    return path.join(path.dirname(portablePath), 'keybinds.json');
+  }
+  return path.join(__dirname, 'keybinds.json');
+}
+
 function getSoundFiles() {
   const dir = getSoundsDir();
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir).filter(f => /\.(mp3|wav|ogg|m4a|aac)$/i.test(f));
 }
 
-function registerHotkeys(broadcastFn) {
+function loadKeybinds() {
+  const p = getKeybindsFilePath();
+  let data = { stop: 'num0', sounds: {} };
+  if (fs.existsSync(p)) {
+    try {
+      const content = fs.readFileSync(p, 'utf-8');
+      data = JSON.parse(content);
+      if (!data.sounds) data.sounds = {};
+      if (!data.stop) data.stop = 'num0';
+    } catch (e) {}
+  } else {
+    const files = getSoundFiles();
+    files.slice(0, 9).forEach((f, idx) => {
+      data.sounds[f] = `num${idx + 1}`;
+    });
+    try { fs.writeFileSync(p, JSON.stringify(data, null, 2), 'utf-8'); } catch (e) {}
+  }
+  return data;
+}
+
+function saveKeybinds(data) {
+  const p = getKeybindsFilePath();
+  try {
+    fs.writeFileSync(p, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {}
+  registerCustomHotkeys(broadcast);
+  broadcast({ reloadKeybinds: 1, keybinds: data });
+  return data;
+}
+
+function registerCustomHotkeys(broadcastFn) {
   globalShortcut.unregisterAll();
+  const keybinds = loadKeybinds();
   const files = getSoundFiles();
 
-  for (let i = 1; i <= 9; i++) {
-    const sound = files[i - 1];
-    if (sound) {
-      try {
-        globalShortcut.register(`num${i}`, () => {
-          broadcastFn({ play: sound });
-        });
-      } catch (err) {}
+  // Đăng ký phím dừng
+  if (keybinds.stop && keybinds.stop.trim()) {
+    try {
+      globalShortcut.register(keybinds.stop.trim(), () => {
+        broadcastFn({ stop: 1 });
+      });
+    } catch (err) {
+      console.error('Không thể gán phím dừng:', keybinds.stop);
     }
   }
 
-  // num0 to Stop All
-  try {
-    globalShortcut.register('num0', () => {
-      broadcastFn({ stop: 1 });
-    });
-  } catch (err) {}
+  // Đăng ký phím cho từng âm thanh
+  for (const filename of files) {
+    const key = keybinds.sounds[filename];
+    if (key && key.trim()) {
+      try {
+        globalShortcut.register(key.trim(), () => {
+          broadcastFn({ play: filename });
+        });
+      } catch (err) {
+        console.error(`Không thể gán phím ${key} cho ${filename}:`, err);
+      }
+    }
+  }
 }
 
 async function toggleTunnel(enable) {
@@ -140,6 +186,49 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ success: true, dir }));
   }
 
+  if (url === '/keybinds' && req.method === 'GET') {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.end(JSON.stringify(loadKeybinds()));
+  }
+
+  if (url === '/keybinds' && req.method === 'POST') {
+    let body = '';
+    req.on('data', c => body += c);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const current = loadKeybinds();
+        if (payload.stop !== undefined) current.stop = payload.stop;
+        if (payload.sounds) current.sounds = { ...current.sounds, ...payload.sounds };
+        if (payload.filename !== undefined) {
+          if (payload.key) {
+            current.sounds[payload.filename] = payload.key;
+          } else {
+            delete current.sounds[payload.filename];
+          }
+        }
+        saveKeybinds(current);
+        res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        return res.end(JSON.stringify({ success: true, keybinds: current }));
+      } catch (err) {
+        res.statusCode = 400;
+        return res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
+  if (url === '/keybinds/reset' && req.method === 'POST') {
+    const data = { stop: 'num0', sounds: {} };
+    const files = getSoundFiles();
+    files.slice(0, 9).forEach((f, idx) => {
+      data.sounds[f] = `num${idx + 1}`;
+    });
+    saveKeybinds(data);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    return res.end(JSON.stringify({ success: true, keybinds: data }));
+  }
+
   if (url === '/tunnel') {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     const enable = query.get('enable') === '1';
@@ -179,25 +268,25 @@ server.listen(PORT, '0.0.0.0');
 
 app.whenReady().then(() => {
   const win = new BrowserWindow({
-    width: 880,
-    height: 720,
-    minWidth: 780,
-    minHeight: 600,
-    title: 'Valorant Soundboard Server',
+    width: 940,
+    height: 760,
+    minWidth: 840,
+    minHeight: 640,
+    title: 'Valorant Stream Deck Soundboard',
     autoHideMenuBar: true,
     webPreferences: { backgroundThrottling: false }
   });
 
   win.loadURL(`http://localhost:${PORT}/engine`);
 
-  // Đăng ký phím tắt NumPad 1-9 và NumPad 0
-  registerHotkeys(broadcast);
+  // Đăng ký custom hotkeys ban đầu
+  registerCustomHotkeys(broadcast);
 
   // Tự động theo dõi thư mục sounds khi có thêm/xóa file
   const soundDir = getSoundsDir();
   try {
     watcher = fs.watch(soundDir, () => {
-      registerHotkeys(broadcast);
+      registerCustomHotkeys(broadcast);
       broadcast({ reload: 1 });
     });
   } catch (e) {}
