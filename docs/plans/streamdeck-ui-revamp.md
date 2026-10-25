@@ -54,6 +54,6 @@
 - Chuyển title window sang English: "Valorant Stream Deck". [x]
 - Chạy kiểm tra `node --check main.js`. [x]
 
-### Bước 4: Đóng gói lại Portable EXE & Cập nhật GitHub [ ]
-- Chạy `npm run dist:portable`. [ ]
-- Commit, merge vào `main`, push lên GitHub và tạo tag release mới. [ ]
+### Bước 4: Đóng gói lại Portable EXE & Cập nhật GitHub [x]
+- Chạy `npm run dist:portable`. [x]
+- Commit, merge vào `main`, push lên GitHub và tạo tag release mới. [x]
