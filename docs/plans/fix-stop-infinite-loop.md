@@ -42,11 +42,11 @@
 - [x] In `destroyAudio(audio)`, clear `onended` and `onerror` handlers.
 - [x] Verify with `node -e` JavaScript syntax check.
 
-### Step 2: Bump Version in `package.json` & Build Portable EXE
-- Bump version to `1.5.1`.
-- Run `npm run dist:portable`.
-- Copy executable to root folder.
-- Merge to `main`, commit, and create tag `v1.5.1`.
+### Step 2: Bump Version in `package.json` & Build Portable EXE [x]
+- [x] Bump version to `1.5.1`.
+- [x] Run `npm run dist:portable` successfully generating `dist/Valorant-Soundboard-Portable.exe` (114.5MB).
+- [x] Copy executable to root folder.
+- [x] Merge to `main`, commit, and create tag `v1.5.1`.
 
 ---
 
