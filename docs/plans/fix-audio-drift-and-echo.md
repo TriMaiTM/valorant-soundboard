@@ -33,6 +33,6 @@
 - [x] Nút Start/Stop linh hoạt, cập nhật thiết bị động khi thay đổi dropdown.
 - [x] Thêm cờ `autoplay-policy: no-user-gesture-required` trong `main.js`.
 
-### Bước 2: Kiểm tra & Build lại Portable EXE [ ]
-- Chạy `npm run dist:portable`.
-- Commit, merge vào `main`, push lên GitHub và tạo tag `v1.4.0`.
+### Bước 2: Kiểm tra & Build lại Portable EXE [x]
+- [x] Chạy `npm run dist:portable` tạo thành công `dist/Valorant-Soundboard-Portable.exe`.
+- [x] Merge vào `main`, push lên GitHub và tạo tag `v1.4.0`.
