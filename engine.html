@@ -860,40 +860,63 @@
     const fill = (sel, list) => sel.innerHTML =
       list.map(d => `<option value="${d.deviceId}">${d.label || 'Default Audio Device'}</option>`).join('');
 
-    (async () => {
+    async function populateAudioDevices() {
       try {
-        (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks().forEach(t => t.stop());
         const devs = await navigator.mediaDevices.enumerateDevices();
         const audioInputs = devs.filter(d => d.kind === 'audioinput');
         const audioOutputs = devs.filter(d => d.kind === 'audiooutput');
+
+        const prevMic = $('mic').value;
+        const prevOut = $('out').value;
+        const prevMon = $('mon').value;
 
         fill($('mic'), audioInputs);
         fill($('out'), audioOutputs);
         fill($('mon'), audioOutputs);
 
-        // Smart Selection:
-        // 1. Mic: choose real physical microphone (exclude CABLE)
-        const realMic = audioInputs.find(d => !/cable|virtual/i.test(d.label)) || audioInputs[0];
-        if (realMic) $('mic').value = realMic.deviceId;
-
-        // 2. Out: Auto-select device containing "CABLE", "VB-Audio", or "Virtual"
-        const cableOut = audioOutputs.find(d => /cable|vb-audio|virtual/i.test(d.label));
-        if (cableOut) {
-          $('out').value = cableOut.deviceId;
+        // Keep previous selection if still available, otherwise smart select:
+        if (prevMic && audioInputs.some(d => d.deviceId === prevMic)) {
+          $('mic').value = prevMic;
+        } else {
+          const realMic = audioInputs.find(d => !/cable|virtual/i.test(d.label)) || audioInputs[0];
+          if (realMic) $('mic').value = realMic.deviceId;
         }
 
-        // 3. Monitor: Auto-select Speakers or Headphones (exclude CABLE)
-        const realMon = audioOutputs.find(d => !/cable|virtual/i.test(d.label) && /headphone|speaker|realtek/i.test(d.label))
-          || audioOutputs.find(d => !/cable|virtual/i.test(d.label))
-          || audioOutputs[0];
-        if (realMon) $('mon').value = realMon.deviceId;
+        if (prevOut && audioOutputs.some(d => d.deviceId === prevOut)) {
+          $('out').value = prevOut;
+        } else {
+          const cableOut = audioOutputs.find(d => /cable|vb-audio|virtual/i.test(d.label));
+          if (cableOut) $('out').value = cableOut.deviceId;
+        }
+
+        if (prevMon && audioOutputs.some(d => d.deviceId === prevMon)) {
+          $('mon').value = prevMon;
+        } else {
+          const realMon = audioOutputs.find(d => !/cable|virtual/i.test(d.label) && /headphone|speaker|realtek/i.test(d.label))
+            || audioOutputs.find(d => !/cable|virtual/i.test(d.label))
+            || audioOutputs[0];
+          if (realMon) $('mon').value = realMon.deviceId;
+        }
 
         checkDeviceConflict();
+      } catch (e) {}
+    }
+
+    (async () => {
+      try {
+        (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks().forEach(t => t.stop());
+        await populateAudioDevices();
       } catch (e) {}
 
       $('mic').onchange = onDeviceChanged;
       $('out').onchange = onDeviceChanged;
       $('mon').onchange = onDeviceChanged;
+      if (navigator.mediaDevices && navigator.mediaDevices.ondevicechange !== undefined) {
+        navigator.mediaDevices.ondevicechange = async () => {
+          await populateAudioDevices();
+          if (isEngineRunning) await setupMicRouting();
+        };
+      }
 
       fetchNetworkInfo();
       await fetchKeybinds();
@@ -1229,6 +1252,15 @@
       }
     };
 
+    function destroyAudio(audio) {
+      if (!audio) return;
+      try {
+        audio.pause();
+        audio.removeAttribute('src');
+        audio.load();
+      } catch (e) {}
+    }
+
     // Discrete SFX Playback: Plays directly from local URL to hardware sink.
     // 100% original speed and pitch, zero WebRTC clock drift, zero buffer lag!
     async function play(n) {
@@ -1245,7 +1277,11 @@
           // 1. Play into CABLE Input (so teammates in Valorant hear it)
           const aCable = new Audio(soundUrl);
           if (typeof aCable.setSinkId === 'function' && outDevice) {
-            await aCable.setSinkId(outDevice);
+            try {
+              await aCable.setSinkId(outDevice);
+            } catch (sinkErr) {
+              console.warn('setSinkId failed for outDevice, falling back to default:', sinkErr);
+            }
           }
 
           // 2. Play into Headphones (so you can monitor/hear it)
@@ -1254,7 +1290,11 @@
           if (monDevice && monDevice !== outDevice) {
             aMon = new Audio(soundUrl);
             if (typeof aMon.setSinkId === 'function') {
-              await aMon.setSinkId(monDevice);
+              try {
+                await aMon.setSinkId(monDevice);
+              } catch (sinkErr) {
+                console.warn('setSinkId failed for monDevice, falling back to default:', sinkErr);
+              }
             }
           }
 
@@ -1263,17 +1303,38 @@
 
           const cleanup = () => {
             activeSounds.delete(aCable);
-            if (aMon) activeSounds.delete(aMon);
+            destroyAudio(aCable);
+            if (aMon) {
+              activeSounds.delete(aMon);
+              destroyAudio(aMon);
+            }
             unhighlightPad(n);
           };
 
           aCable.onended = cleanup;
-          aCable.onerror = cleanup;
-          if (aMon) aMon.onerror = cleanup;
+          aCable.onerror = (e) => {
+            console.warn('Audio playback error on aCable:', e);
+            cleanup();
+          };
+          if (aMon) {
+            aMon.onerror = (e) => {
+              console.warn('Audio playback error on aMon:', e);
+              cleanup();
+            };
+          }
 
-          await aCable.play().catch(() => {});
-          if (aMon) await aMon.play().catch(() => {});
+          await aCable.play().catch(err => {
+            console.warn('aCable.play() failed:', err);
+            cleanup();
+          });
+          if (aMon) {
+            await aMon.play().catch(err => {
+              console.warn('aMon.play() failed:', err);
+              cleanup();
+            });
+          }
         } catch (err) {
+          console.error('play() unexpected error:', err);
           unhighlightPad(n);
         }
       }, 300);
@@ -1288,10 +1349,7 @@
 
       // Immediately pause and reset all playing audio
       activeSounds.forEach(a => {
-        try {
-          a.pause();
-          a.currentTime = 0;
-        } catch (e) {}
+        destroyAudio(a);
       });
       activeSounds.clear();
       document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));

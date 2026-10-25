@@ -200,20 +200,6 @@
       background: linear-gradient(145deg, #182845 0%, #0e192c 100%);
     }
 
-    .pad-key-tag {
-      position: absolute;
-      top: 6px;
-      right: 8px;
-      background: rgba(0, 0, 0, 0.55);
-      border: 1px solid rgba(99, 102, 241, 0.35);
-      color: #a5b4fc;
-      border-radius: 5px;
-      padding: 2px 5px;
-      font-size: 0.65rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-    }
-
     .pad-icon {
       color: #818cf8;
       margin-top: 4px;
@@ -304,7 +290,6 @@
         <rect x="5" y="5" width="14" height="14" rx="2"></rect>
       </svg>
       STOP ALL
-      <span id="stop-key-badge" style="font-size: 0.7rem; opacity: 0.9; margin-left: 6px; font-weight: 800; background: rgba(0,0,0,0.35); padding: 2px 7px; border-radius: 4px; font-family: monospace;">num0</span>
     </button>
   </div>
 
@@ -338,12 +323,9 @@
       }
 
       filtered.forEach(filename => {
-        const assignedKey = keybindMap.sounds ? (keybindMap.sounds[filename] || '') : '';
-
         const btn = document.createElement('div');
         btn.className = 'deck-pad';
         btn.innerHTML = `
-          ${assignedKey ? `<span class="pad-key-tag">${assignedKey}</span>` : ''}
           <div class="pad-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M9 18V5l12-2v13"></path>
@@ -362,10 +344,6 @@
         };
         gridEl.appendChild(btn);
       });
-
-      if (keybindMap.stop) {
-        document.getElementById('stop-key-badge').textContent = keybindMap.stop;
-      }
     }
 
     searchInput.addEventListener('input', (e) => {

@@ -1,6 +1,6 @@
 {
   "name": "valorant-soundboard",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Soundboard cho Valorant với phím tắt NumPad toàn cục và điều khiển PWA trên điện thoại",
   "main": "main.js",
   "scripts": {

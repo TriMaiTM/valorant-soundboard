@@ -1,5 +1,8 @@
-const { app, BrowserWindow, globalShortcut, shell } = require('electron');
+const { app, BrowserWindow, globalShortcut, shell, powerSaveBlocker } = require('electron');
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+app.commandLine.appendSwitch('disable-renderer-backgrounding');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+app.commandLine.appendSwitch('disable-backgrounding-occluded-windows');
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os');
 const { WebSocketServer } = require('ws');
 const PORT = 3000;
@@ -265,9 +268,23 @@ wss.on('connection', ws => ws.on('message', d => {
   try { const m = JSON.parse(d); if (m.play || m.stop) broadcast(m); } catch {}
 }));
 
+// WebSocket keep-alive heartbeat to prevent idle connection drops
+const heartbeatInterval = setInterval(() => {
+  wss.clients.forEach(ws => {
+    if (ws.readyState === 1) {
+      try { ws.ping(); } catch (e) {}
+    }
+  });
+}, 15000);
+
 server.listen(PORT, '0.0.0.0');
 
 app.whenReady().then(() => {
+  // Prevent OS from sleeping or putting the app in EcoQoS efficiency mode
+  try {
+    powerSaveBlocker.start('prevent-app-suspension');
+  } catch (e) {}
+
   const win = new BrowserWindow({
     width: 940,
     height: 760,
@@ -294,6 +311,7 @@ app.whenReady().then(() => {
 
   // Đóng hoàn toàn tiến trình khi tắt cửa sổ
   win.on('closed', async () => {
+    clearInterval(heartbeatInterval);
     if (watcher) watcher.close();
     globalShortcut.unregisterAll();
     if (tunnelInstance) {
