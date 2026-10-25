@@ -1,4 +1,5 @@
 const { app, BrowserWindow, globalShortcut, shell } = require('electron');
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
 const http = require('http'), fs = require('fs'), path = require('path'), os = require('os');
 const { WebSocketServer } = require('ws');
 const PORT = 3000;

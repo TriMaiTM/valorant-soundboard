@@ -109,7 +109,6 @@
       color: #fff;
     }
 
-    /* Tooltip */
     .icon-btn::after {
       content: attr(data-tooltip);
       position: absolute;
@@ -164,7 +163,7 @@
       box-shadow: 0 0 10px currentColor;
     }
 
-    /* Top Grid: Expanded Audio Router & Mobile Controller */
+    /* Top Grid */
     .top-grid {
       display: grid;
       grid-template-columns: 1.25fr 0.85fr;
@@ -185,7 +184,7 @@
       backdrop-filter: blur(14px);
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .card-title {
@@ -230,6 +229,20 @@
 
     select:focus {
       border-color: var(--accent);
+    }
+
+    /* Safety Warning Banner */
+    #device-conflict-warning {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.74rem;
+      color: #fca5a5;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      line-height: 1.35;
     }
 
     .btn-start {
@@ -350,9 +363,7 @@
       color: #fff;
     }
 
-    /* ======================================= */
-    /* STREAM DECK SECTION                     */
-    /* ======================================= */
+    /* STREAM DECK SECTION */
     .streamdeck-container {
       background: #090e1c;
       border: 1px solid rgba(99, 102, 241, 0.2);
@@ -446,7 +457,6 @@
       width: 100%;
     }
 
-    /* Subtle Keybind Label on top left */
     .pad-key-text {
       font-size: 0.68rem;
       font-family: 'JetBrains Mono', monospace;
@@ -460,7 +470,6 @@
       max-width: 74px;
     }
 
-    /* 3-Lines Menu Button in top right corner */
     .pad-menu-btn {
       background: transparent;
       border: none;
@@ -627,7 +636,7 @@
       color: #cbd5e1;
     }
 
-    /* Toast notification */
+    /* Toast */
     #toast {
       position: fixed;
       bottom: 20px;
@@ -665,14 +674,12 @@
       </div>
     </div>
     <div class="header-actions">
-      <!-- Lucide Folder Icon Button -->
       <button class="icon-btn" data-tooltip="Open Sounds Folder" onclick="openSoundsFolder()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
         </svg>
       </button>
 
-      <!-- Lucide Rotate-CCW Icon Button -->
       <button class="icon-btn" data-tooltip="Reset Default Keybinds" onclick="resetDefaultKeybinds()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -680,7 +687,6 @@
         </svg>
       </button>
 
-      <!-- Status Pill -->
       <div id="engine-status" class="engine-status-pill">
         <span class="dot"></span>
         <span id="engine-status-text">Offline</span>
@@ -701,7 +707,7 @@
 
       <div class="audio-inputs-grid">
         <div class="form-group">
-          <label for="mic">Microphone:</label>
+          <label for="mic">Microphone (Voice):</label>
           <select id="mic"></select>
         </div>
         <div class="form-group">
@@ -712,6 +718,18 @@
           <label for="mon">Monitoring (Headphones):</label>
           <select id="mon"></select>
         </div>
+      </div>
+
+      <!-- Device Conflict Safety Banner -->
+      <div id="device-conflict-warning">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+          <line x1="12" y1="9" x2="12" y2="13"></line>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>
+          <strong>Notice:</strong> "Output" and "Monitoring" are set to the same device! To voice chat in Valorant without hearing your own typing echo, set <strong>Output</strong> to <code>CABLE Input</code>.
+        </span>
       </div>
 
       <button id="start" class="btn-start">
@@ -791,7 +809,7 @@
     </div>
   </div>
 
-  <!-- Keybind Configuration Popover Modal -->
+  <!-- Keybind Configuration Modal -->
   <div id="key-modal" class="modal-backdrop" onclick="closeKeyModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -828,10 +846,16 @@
 
   <script>
     const $ = id => document.getElementById(id);
-    let ctx, soundGain, cache = {}, playing = new Set();
     let networkData = null, soundList = [], keybindMap = { stop: 'num0', sounds: {} };
-    let activeModalTarget = null; // 'stop' or 'filename.mp3'
+    let activeModalTarget = null;
     let isRecordingInModal = false;
+
+    // Rock-solid Audio State:
+    let isEngineRunning = false;
+    let micAudioElement = null;
+    let micMediaStream = null;
+    const activeSounds = new Set(); // Tracks currently playing discrete sound instances
+    const pendingTimeouts = new Set(); // Tracks pending 300ms PTT buffer timers
 
     const fill = (sel, list) => sel.innerHTML =
       list.map(d => `<option value="${d.deviceId}">${d.label || 'Default Audio Device'}</option>`).join('');
@@ -840,16 +864,61 @@
       try {
         (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks().forEach(t => t.stop());
         const devs = await navigator.mediaDevices.enumerateDevices();
-        fill($('mic'), devs.filter(d => d.kind === 'audioinput'));
-        fill($('out'), devs.filter(d => d.kind === 'audiooutput'));
-        fill($('mon'), devs.filter(d => d.kind === 'audiooutput'));
+        const audioInputs = devs.filter(d => d.kind === 'audioinput');
+        const audioOutputs = devs.filter(d => d.kind === 'audiooutput');
+
+        fill($('mic'), audioInputs);
+        fill($('out'), audioOutputs);
+        fill($('mon'), audioOutputs);
+
+        // Smart Selection:
+        // 1. Mic: choose real physical microphone (exclude CABLE)
+        const realMic = audioInputs.find(d => !/cable|virtual/i.test(d.label)) || audioInputs[0];
+        if (realMic) $('mic').value = realMic.deviceId;
+
+        // 2. Out: Auto-select device containing "CABLE", "VB-Audio", or "Virtual"
+        const cableOut = audioOutputs.find(d => /cable|vb-audio|virtual/i.test(d.label));
+        if (cableOut) {
+          $('out').value = cableOut.deviceId;
+        }
+
+        // 3. Monitor: Auto-select Speakers or Headphones (exclude CABLE)
+        const realMon = audioOutputs.find(d => !/cable|virtual/i.test(d.label) && /headphone|speaker|realtek/i.test(d.label))
+          || audioOutputs.find(d => !/cable|virtual/i.test(d.label))
+          || audioOutputs[0];
+        if (realMon) $('mon').value = realMon.deviceId;
+
+        checkDeviceConflict();
       } catch (e) {}
+
+      $('mic').onchange = onDeviceChanged;
+      $('out').onchange = onDeviceChanged;
+      $('mon').onchange = onDeviceChanged;
 
       fetchNetworkInfo();
       await fetchKeybinds();
       await loadSoundList();
       connect();
     })();
+
+    async function onDeviceChanged() {
+      checkDeviceConflict();
+      if (isEngineRunning) {
+        await setupMicRouting();
+      }
+    }
+
+    function checkDeviceConflict() {
+      const warningEl = $('device-conflict-warning');
+      const isConflict = $('out').value && $('mon').value && ($('out').value === $('mon').value);
+      if (isConflict) {
+        warningEl.style.display = 'flex';
+        $('out').style.borderColor = '#ef4444';
+      } else {
+        warningEl.style.display = 'none';
+        $('out').style.borderColor = '';
+      }
+    }
 
     async function openSoundsFolder() {
       try { await fetch('/open-sounds-dir'); } catch (e) {}
@@ -867,9 +936,6 @@
         const r = await fetch('/list');
         soundList = await r.json();
         renderStreamDeck();
-        if (ctx) {
-          for (const n of soundList) await load(n);
-        }
       } catch (e) {}
     }
 
@@ -1077,58 +1143,157 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    /* Web Audio & Routing */
-    async function route(stream, id) {
-      const a = new Audio(); a.srcObject = stream;
-      if (typeof a.setSinkId === 'function') await a.setSinkId(id);
-      await a.play();
+    /* ========================================================= */
+    /* ROCK-SOLID AUDIO PIPELINE (NO DRIFT, NO PITCH DROP, NO ECHO) */
+    /* ========================================================= */
+
+    async function setupMicRouting() {
+      // 1. Clean up existing mic stream and audio elements
+      if (micAudioElement) {
+        try { micAudioElement.pause(); micAudioElement.srcObject = null; } catch (e) {}
+        micAudioElement = null;
+      }
+      if (micMediaStream) {
+        try { micMediaStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        micMediaStream = null;
+      }
+
+      if (!isEngineRunning) return;
+
+      const micId = $('mic').value;
+      const outId = $('out').value;
+      const monId = $('mon').value;
+
+      // SAFETY: Only route mic if Output is different from Monitor!
+      // If out === mon (both set to speakers), DO NOT route mic to prevent echoing own voice/keyboard into own ears!
+      if (outId && outId === monId) {
+        console.warn('Microphone pass-through blocked: Output and Monitoring share the same device.');
+        return;
+      }
+
+      try {
+        micMediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            deviceId: micId ? { exact: micId } : undefined,
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          }
+        });
+
+        if (outId) {
+          micAudioElement = new Audio();
+          micAudioElement.srcObject = micMediaStream;
+          if (typeof micAudioElement.setSinkId === 'function') {
+            await micAudioElement.setSinkId(outId);
+          }
+          await micAudioElement.play();
+        }
+      } catch (err) {
+        console.error('Error starting microphone pass-through:', err);
+      }
+    }
+
+    async function startEngine() {
+      checkDeviceConflict();
+      $('start').classList.add('running');
+      $('start-btn-text').textContent = 'ENGINE ACTIVE (CLICK TO STOP)';
+      $('engine-status').className = 'engine-status-pill active';
+      $('engine-status-text').textContent = 'Active';
+      isEngineRunning = true;
+      await setupMicRouting();
+    }
+
+    async function stopEngine() {
+      isEngineRunning = false;
+      $('start').classList.remove('running');
+      $('start-btn-text').textContent = 'START ENGINE';
+      $('engine-status').className = 'engine-status-pill';
+      $('engine-status-text').textContent = 'Offline';
+
+      if (micAudioElement) {
+        try { micAudioElement.pause(); micAudioElement.srcObject = null; } catch (e) {}
+        micAudioElement = null;
+      }
+      if (micMediaStream) {
+        try { micMediaStream.getTracks().forEach(t => t.stop()); } catch (e) {}
+        micMediaStream = null;
+      }
     }
 
     $('start').onclick = async () => {
-      if (ctx) return;
-      $('start').disabled = true;
-      $('start').classList.add('running');
-      $('start-btn-text').textContent = 'ENGINE ACTIVE';
-      $('engine-status').className = 'engine-status-pill active';
-      $('engine-status-text').textContent = 'Active';
-
-      ctx = new AudioContext({ latencyHint: 'interactive' });
-      const mic = await navigator.mediaDevices.getUserMedia({ audio: {
-        deviceId: { exact: $('mic').value },
-        echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
-      const toCable = ctx.createMediaStreamDestination();
-      const toMon = ctx.createMediaStreamDestination();
-      ctx.createMediaStreamSource(mic).connect(toCable);
-      soundGain = ctx.createGain();
-      soundGain.connect(toCable); soundGain.connect(toMon);
-      await route(toCable.stream, $('out').value);
-      await route(toMon.stream, $('mon').value);
-      
-      for (const n of soundList) await load(n);
+      if (isEngineRunning) {
+        await stopEngine();
+      } else {
+        await startEngine();
+      }
     };
 
-    async function load(n) {
-      if (cache[n]) return cache[n];
-      const r = await fetch('/sounds/' + encodeURIComponent(n));
-      return cache[n] = await ctx.decodeAudioData(await r.arrayBuffer());
-    }
-
+    // Discrete SFX Playback: Plays directly from local URL to hardware sink.
+    // 100% original speed and pitch, zero WebRTC clock drift, zero buffer lag!
     async function play(n) {
-      if (!ctx) return;
-      const s = ctx.createBufferSource();
-      s.buffer = await load(n); s.connect(soundGain);
-      s.start(ctx.currentTime + 0.3); // 300ms PTT buffer
-
+      const soundUrl = '/sounds/' + encodeURIComponent(n);
       highlightPad(n);
-      playing.add(s);
-      s.onended = () => {
-        playing.delete(s);
-        unhighlightPad(n);
-      };
+
+      // 300ms buffer for Push-to-Talk activation
+      const timerId = setTimeout(async () => {
+        pendingTimeouts.delete(timerId);
+        try {
+          const outDevice = $('out').value;
+          const monDevice = $('mon').value;
+
+          // 1. Play into CABLE Input (so teammates in Valorant hear it)
+          const aCable = new Audio(soundUrl);
+          if (typeof aCable.setSinkId === 'function' && outDevice) {
+            await aCable.setSinkId(outDevice);
+          }
+
+          // 2. Play into Headphones (so you can monitor/hear it)
+          // Note: If outDevice === monDevice, only play once to avoid double loudness
+          let aMon = null;
+          if (monDevice && monDevice !== outDevice) {
+            aMon = new Audio(soundUrl);
+            if (typeof aMon.setSinkId === 'function') {
+              await aMon.setSinkId(monDevice);
+            }
+          }
+
+          activeSounds.add(aCable);
+          if (aMon) activeSounds.add(aMon);
+
+          const cleanup = () => {
+            activeSounds.delete(aCable);
+            if (aMon) activeSounds.delete(aMon);
+            unhighlightPad(n);
+          };
+
+          aCable.onended = cleanup;
+          aCable.onerror = cleanup;
+          if (aMon) aMon.onerror = cleanup;
+
+          await aCable.play().catch(() => {});
+          if (aMon) await aMon.play().catch(() => {});
+        } catch (err) {
+          unhighlightPad(n);
+        }
+      }, 300);
+
+      pendingTimeouts.add(timerId);
     }
 
     function stopAll() {
-      playing.forEach(s => s.stop());
+      // Cancel all pending PTT buffer timeouts
+      pendingTimeouts.forEach(tid => clearTimeout(tid));
+      pendingTimeouts.clear();
+
+      // Immediately pause and reset all playing audio
+      activeSounds.forEach(a => {
+        try {
+          a.pause();
+          a.currentTime = 0;
+        } catch (e) {}
+      });
+      activeSounds.clear();
       document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));
       send({ stop: 1 });
     }
@@ -1154,10 +1319,7 @@
             renderStreamDeck();
           }
           if (m.play) play(m.play);
-          if (m.stop) {
-            playing.forEach(s => s.stop());
-            document.querySelectorAll('.deck-pad').forEach(p => p.classList.remove('playing'));
-          }
+          if (m.stop) stopAll();
         } catch (err) {}
       };
       ws.onclose = () => setTimeout(connect, 1000);
