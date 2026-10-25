@@ -1,0 +1,65 @@
+<body>
+Mic thật: <select id="mic"></select><br>
+Xuất ra (chọn CABLE Input): <select id="out"></select><br>
+Nghe lại (tai nghe của bạn): <select id="mon"></select><br>
+<button id="start">Start</button>
+<script>
+const $ = id => document.getElementById(id);
+let ctx, soundGain, cache = {}, playing = new Set();
+
+const fill = (sel, list) => sel.innerHTML =
+  list.map(d => `<option value="${d.deviceId}">${d.label}</option>`).join('');
+
+(async () => {
+  (await navigator.mediaDevices.getUserMedia({ audio: true })).getTracks().forEach(t => t.stop());
+  const devs = await navigator.mediaDevices.enumerateDevices();
+  fill($('mic'), devs.filter(d => d.kind === 'audioinput'));
+  fill($('out'), devs.filter(d => d.kind === 'audiooutput'));
+  fill($('mon'), devs.filter(d => d.kind === 'audiooutput'));
+})();
+
+async function route(stream, id) {
+  const a = new Audio(); a.srcObject = stream;
+  await a.setSinkId(id); await a.play();
+}
+
+$('start').onclick = async () => {
+  ctx = new AudioContext({ latencyHint: 'interactive' });
+  const mic = await navigator.mediaDevices.getUserMedia({ audio: {
+    deviceId: { exact: $('mic').value },
+    echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  const toCable = ctx.createMediaStreamDestination();
+  const toMon = ctx.createMediaStreamDestination();
+  ctx.createMediaStreamSource(mic).connect(toCable);   // mic chỉ đi vào cable
+  soundGain = ctx.createGain();
+  soundGain.connect(toCable); soundGain.connect(toMon); // sound đi cả hai nhánh
+  await route(toCable.stream, $('out').value);
+  await route(toMon.stream, $('mon').value);
+  for (const n of await (await fetch('/list')).json()) await load(n); // nạp sẵn
+  connect();
+};
+
+async function load(n) {
+  if (cache[n]) return cache[n];
+  const r = await fetch('/sounds/' + encodeURIComponent(n));
+  return cache[n] = await ctx.decodeAudioData(await r.arrayBuffer());
+}
+
+async function play(n) {
+  const s = ctx.createBufferSource();
+  s.buffer = await load(n); s.connect(soundGain);
+  s.start(ctx.currentTime + 0.3);          // trễ 300 ms để kịp giữ PTT
+  playing.add(s); s.onended = () => playing.delete(s);
+}
+
+function connect() {
+  const ws = new WebSocket('ws://' + location.host);
+  ws.onmessage = e => {
+    const m = JSON.parse(e.data);
+    if (m.play) play(m.play);
+    if (m.stop) playing.forEach(s => s.stop());
+  };
+  ws.onclose = () => setTimeout(connect, 1000);
+}
+</script>
+</body>

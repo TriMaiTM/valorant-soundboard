@@ -1,0 +1,16 @@
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font-family:sans-serif;margin:8px}button{width:48%;height:80px;margin:1%;font-size:16px}</style>
+<div id="g"></div>
+<button id="stop">Dừng</button>
+<script>
+let ws;
+function connect() { ws = new WebSocket('ws://' + location.host); ws.onclose = () => setTimeout(connect, 1000); }
+connect();
+const send = m => ws.readyState === 1 && ws.send(JSON.stringify(m));
+document.getElementById('stop').onclick = () => send({ stop: 1 });
+fetch('/list').then(r => r.json()).then(list => list.forEach(n => {
+  const b = document.createElement('button');
+  b.textContent = n; b.onclick = () => send({ play: n });
+  document.getElementById('g').appendChild(b);
+}));
+</script>
