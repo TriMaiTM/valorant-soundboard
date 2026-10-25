@@ -1,0 +1,19 @@
+{
+  "name": "Valorant Soundboard",
+  "short_name": "Soundboard",
+  "description": "Điều khiển Soundboard Valorant qua điện thoại",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#090d16",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

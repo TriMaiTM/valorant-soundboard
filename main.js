@@ -3,8 +3,20 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { WebSocketServer } = require('ws');
 const PORT = 3000, SOUNDS = path.join(__dirname, 'sounds');
 
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.ico': 'image/x-icon',
+  '.mp3': 'audio/mpeg',
+  '.wav': 'audio/wav',
+  '.ogg': 'audio/ogg'
+};
+
 function send(res, f) {
-  if (f.endsWith('.html')) res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  const ext = path.extname(f).toLowerCase();
+  if (MIME[ext]) res.setHeader('Content-Type', MIME[ext]);
   fs.createReadStream(path.join(__dirname, f))
     .on('error', () => { res.statusCode = 404; res.end(); })
     .pipe(res);
@@ -14,8 +26,10 @@ const server = http.createServer((req, res) => {
   const url = decodeURIComponent(req.url.split('?')[0]);
   if (url === '/') return send(res, 'controller.html');
   if (url === '/engine') return send(res, 'engine.html');
+  if (url === '/manifest.json') return send(res, 'manifest.json');
+  if (url.startsWith('/icons/')) return send(res, path.join('icons', path.basename(url)));
   if (url === '/list') {
-    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     return res.end(JSON.stringify(fs.readdirSync(SOUNDS)));
   }
   if (url.startsWith('/sounds/')) return send(res, path.join('sounds', path.basename(url)));
